@@ -1,0 +1,15 @@
+Introducing "Hexa LCD"
+
+Hexa LCD is a monospaced symbol font, designed for use in sci-fi settings, puzzles, and other less-than-usual spaces. It includes glyphs for numerical characters, basic math function characters, basic latin punctiuation, and all basic latin characters. 
+
+Design Principles
+
+This font was designed as a thought experiment, starting from a fully filled LCD-style hexagonal base. All characters are created by displaying only some of the available lines. Each type of character has specific rules:
+     - All letter glyphs take up the full width of the space
+     - No punctuation glyphs take up the full width
+     - Only numerical glyphs have the full outer ring filled
+If you choose to modify this font by adding characters, please consider abiding by these same principles. 
+
+This is the debut font by Q.G. Pennyworth, and as such probably has some problems with it. Testing on Windows and Mac environments has not crashed anything yet. For bug reports and other questions, comments, complaints, and diatribes please contact qgpennyworth@gmail.com
+
+This font is released Kopyleft (k) and absolutely no rights whatsoever are reserved. Have fun, be yourself. Free for commercial, personal, and any other uses you may find.
