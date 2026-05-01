@@ -14,7 +14,7 @@ public class LearningMenuManager : MonoBehaviour
         // 1. FORCIBLY OPEN INTRO PANEL
         if (introPanel != null) introPanel.SetActive(true);
 
-        // 2. FORCIBLY CLOSE ALL SHAPE PANELS
+        // 2. F ORCIBLY CLOSE ALL SHAPE PANELS
         foreach (GameObject panel in shapePanels)
         {
             if (panel != null) panel.SetActive(false);
