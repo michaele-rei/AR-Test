@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using DG.Tweening; 
 
 public class ARUIManager : MonoBehaviour
 {
@@ -45,13 +46,17 @@ public class ARUIManager : MonoBehaviour
     public string currentUnit = "cm";
     private bool isUIVisible = true;
     private bool isSystemUpdating = false;
+    private bool isSolidPlaced = false; 
+
+    // NEW: Variables to control the sliding drawer
+    private RectTransform unitMenuRect;
+    private Vector2 unitMenuOpenPos;
 
     void Start()
     {
-        // ISSUE 1 FIX: Expand the sliders beyond 1! (Defaulting to 500cm max)
-        row1Slider.maxValue = 500f;
-        row2Slider.maxValue = 500f;
-        row3Slider.maxValue = 500f;
+        row1Slider.wholeNumbers = false;
+        row2Slider.wholeNumbers = false;
+        row3Slider.wholeNumbers = false;
 
         row1Slider.onValueChanged.AddListener(delegate { OnSliderMoved(); });
         row2Slider.onValueChanged.AddListener(delegate { OnSliderMoved(); });
@@ -61,14 +66,29 @@ public class ARUIManager : MonoBehaviour
         if (row2Input != null) row2Input.onEndEdit.AddListener(delegate { OnInputEdited(2); });
         if (row3Input != null) row3Input.onEndEdit.AddListener(delegate { OnInputEdited(3); });
 
-        if (unitFlyoutMenu != null) unitFlyoutMenu.SetActive(false);
+        // NEW: Memorize exactly where you placed the menu in the Unity Editor
+        if (unitFlyoutMenu != null) 
+        {
+            unitMenuRect = unitFlyoutMenu.GetComponent<RectTransform>();
+            unitMenuOpenPos = unitMenuRect.anchoredPosition;
+            unitFlyoutMenu.SetActive(false);
+        }
+
         ResetUI();
     }
 
     public void SetupUIForShape(string shapeName)
     {
+        isSolidPlaced = true; 
         isUIVisible = true;
-        if (hideableUIGroup != null) hideableUIGroup.SetActive(true);
+        
+        if (hideableUIGroup != null) 
+        {
+            hideableUIGroup.SetActive(true);
+            CanvasGroup cg = GetOrAddCanvasGroup(hideableUIGroup);
+            cg.alpha = 1f;
+            hideableUIGroup.transform.localScale = Vector3.one;
+        }
 
         isSystemUpdating = true; 
 
@@ -91,7 +111,7 @@ public class ARUIManager : MonoBehaviour
             row1.SetActive(true); row2.SetActive(true);
             if (dashRow2Container != null) dashRow2Container.SetActive(true);
         }
-        else if (shapeName == "RectangularPrism")
+        else if (shapeName == "Rectangle")
         {
             row1Label.text = "Length:"; row2Label.text = "Height:"; row3Label.text = "Width:";
             row1.SetActive(true); row2.SetActive(true); row3.SetActive(true);
@@ -99,23 +119,23 @@ public class ARUIManager : MonoBehaviour
             if (dashRow3Container != null) dashRow3Container.SetActive(true);
         }
 
+        SetAbsoluteSliderBoundsAndValue(0.5f);
         OnSliderMoved(); 
         isSystemUpdating = false; 
     }
 
     public void OnSliderMoved()
     {
-        if (!row1Input.isFocused) row1Input.text = row1Slider.value.ToString("F1");
-        if (!row2Input.isFocused) row2Input.text = row2Slider.value.ToString("F1");
-        if (!row3Input.isFocused) row3Input.text = row3Slider.value.ToString("F1");
+        if (!row1Input.isFocused) row1Input.text = row1Slider.value.ToString("F2"); 
+        if (!row2Input.isFocused) row2Input.text = row2Slider.value.ToString("F2");
+        if (!row3Input.isFocused) row3Input.text = row3Slider.value.ToString("F2");
 
-        dashRow1Txt.text = row1Label.text.Replace(":", "") + ": " + row1Slider.value.ToString("F1") + " " + currentUnit;
-        if (row2.activeSelf) dashRow2Txt.text = row2Label.text.Replace(":", "") + ": " + row2Slider.value.ToString("F1") + " " + currentUnit;
-        if (row3.activeSelf) dashRow3Txt.text = row3Label.text.Replace(":", "") + ": " + row3Slider.value.ToString("F1") + " " + currentUnit;
+        dashRow1Txt.text = row1Label.text.Replace(":", "") + ": " + row1Slider.value.ToString("F2") + " " + currentUnit;
+        if (row2.activeSelf) dashRow2Txt.text = row2Label.text.Replace(":", "") + ": " + row2Slider.value.ToString("F2") + " " + currentUnit;
+        if (row3.activeSelf) dashRow3Txt.text = row3Label.text.Replace(":", "") + ": " + row3Slider.value.ToString("F2") + " " + currentUnit;
 
         if (arController != null)
         {
-            // ISSUE 2 FIX: Convert the UI values to precise real-world meters for the AR engine
             float mult = GetMultiplierToMeters(currentUnit);
             arController.UpdateDimensionsFromUI(row1Slider.value * mult, row2Slider.value * mult, row3Slider.value * mult, !isSystemUpdating);
         }
@@ -124,15 +144,29 @@ public class ARUIManager : MonoBehaviour
     public void OnInputEdited(int rowNum)
     {
         float newValue;
-        if (rowNum == 1 && float.TryParse(row1Input.text, out newValue)) row1Slider.value = newValue;
-        else if (rowNum == 2 && float.TryParse(row2Input.text, out newValue)) row2Slider.value = newValue;
-        else if (rowNum == 3 && float.TryParse(row3Input.text, out newValue)) row3Slider.value = newValue;
+        if (rowNum == 1 && float.TryParse(row1Input.text, out newValue)) 
+        {
+            newValue = Mathf.Clamp(newValue, row1Slider.minValue, row1Slider.maxValue);
+            row1Slider.value = newValue;
+            row1Input.text = newValue.ToString("F2"); 
+        }
+        else if (rowNum == 2 && float.TryParse(row2Input.text, out newValue)) 
+        {
+            newValue = Mathf.Clamp(newValue, row2Slider.minValue, row2Slider.maxValue);
+            row2Slider.value = newValue;
+            row2Input.text = newValue.ToString("F2");
+        }
+        else if (rowNum == 3 && float.TryParse(row3Input.text, out newValue)) 
+        {
+            newValue = Mathf.Clamp(newValue, row3Slider.minValue, row3Slider.maxValue);
+            row3Slider.value = newValue;
+            row3Input.text = newValue.ToString("F2");
+        }
     }
 
     public void UpdateSlidersSilently(float valX_Meters, float valY_Meters, float valZ_Meters)
     {
         isSystemUpdating = true;
-        // Convert the AR engine's meters back into the user's selected UI unit
         float mult = GetMultiplierToMeters(currentUnit);
         row1Slider.value = valX_Meters / mult;
         row2Slider.value = valY_Meters / mult;
@@ -143,7 +177,6 @@ public class ARUIManager : MonoBehaviour
 
     public void UpdateDashboardVolume(float volumeInMeters)
     {
-        // Convert cubic meters back to the UI unit (cm³, in³)
         float mult = GetMultiplierToMeters(currentUnit);
         float displayVol = volumeInMeters / Mathf.Pow(mult, 3);
         dashVolumeTxt.text = "Volume: " + displayVol.ToString("F2") + " " + currentUnit + "³";
@@ -151,38 +184,180 @@ public class ARUIManager : MonoBehaviour
 
     public void ToggleEyeView()
     {
+        if (!isSolidPlaced || hideableUIGroup == null) return; 
+
         isUIVisible = !isUIVisible;
-        if (hideableUIGroup != null) hideableUIGroup.SetActive(isUIVisible);
-        if (unitFlyoutMenu != null) unitFlyoutMenu.SetActive(false); 
+        CanvasGroup cg = GetOrAddCanvasGroup(hideableUIGroup);
+
+        DOTween.Kill(hideableUIGroup.transform);
+        DOTween.Kill(cg);
+
+        if (isUIVisible)
+        {
+            hideableUIGroup.SetActive(true);
+            cg.alpha = 0f;
+            hideableUIGroup.transform.localScale = Vector3.one * 0.9f;
+
+            cg.DOFade(1f, 0.3f);
+            hideableUIGroup.transform.DOScale(1f, 0.3f).SetEase(Ease.OutBack);
+        }
+        else
+        {
+            cg.DOFade(0f, 0.2f);
+            hideableUIGroup.transform.DOScale(0.9f, 0.2f).SetEase(Ease.InBack).OnComplete(() => 
+            {
+                hideableUIGroup.SetActive(false);
+            });
+
+            if (unitFlyoutMenu != null && unitFlyoutMenu.activeSelf) 
+            {
+                ToggleUnitMenu(); 
+            }
+        }
     }
 
-    public void ToggleUnitMenu() { if (unitFlyoutMenu != null) unitFlyoutMenu.SetActive(!unitFlyoutMenu.activeSelf); }
+    // --- REWRITTEN: DRAWER SLIDE ANIMATION ---
+    public void ToggleUnitMenu() 
+    { 
+        if (!isSolidPlaced || unitFlyoutMenu == null) return; 
 
-    // --- ISSUE 2 FIX: THE REALISTIC UNIT ENGINE ---
+        bool isOpening = !unitFlyoutMenu.activeSelf;
+        CanvasGroup cg = GetOrAddCanvasGroup(unitFlyoutMenu);
+
+        // Stop any current sliding if the user taps really fast
+        DOTween.Kill(unitMenuRect);
+        DOTween.Kill(cg);
+
+        // Adjust this number if the drawer needs to slide further to hide completely!
+        float slideDistanceX = 150f; 
+
+        if (isOpening)
+        {
+            unitFlyoutMenu.SetActive(true);
+            
+            // Start the drawer shifted to the right, hidden behind the ruler
+            unitMenuRect.anchoredPosition = new Vector2(unitMenuOpenPos.x + slideDistanceX, unitMenuOpenPos.y);
+            cg.alpha = 0f;
+
+            // Slide left to its final open position
+            unitMenuRect.DOAnchorPos(unitMenuOpenPos, 0.3f).SetEase(Ease.OutBack);
+            cg.DOFade(1f, 0.3f);
+        }
+        else
+        {
+            // Slide right to hide behind the ruler
+            Vector2 closedPos = new Vector2(unitMenuOpenPos.x + slideDistanceX, unitMenuOpenPos.y);
+            
+            unitMenuRect.DOAnchorPos(closedPos, 0.2f).SetEase(Ease.InBack);
+            cg.DOFade(0f, 0.2f).OnComplete(() => 
+            {
+                unitFlyoutMenu.SetActive(false);
+            });
+        }
+    }
+
     public void SetUnit(string newUnit)
     {
         if (newUnit == currentUnit) return; 
 
-        float oldMult = GetMultiplierToMeters(currentUnit);
-        float newMult = GetMultiplierToMeters(newUnit);
-        float conversion = oldMult / newMult;
+        float currentMult = GetMultiplierToMeters(currentUnit);
+        float currentSizeMetersX = row1Slider.value * currentMult;
+        float currentSizeMetersY = row2Slider.value * currentMult;
+        float currentSizeMetersZ = row3Slider.value * currentMult;
 
-        isSystemUpdating = true; // Lock AR updates while we mathematically shift the sliders
-
-        // Convert the max boundaries (e.g., 500 cm becomes 5 m)
-        row1Slider.maxValue *= conversion;
-        row2Slider.maxValue *= conversion;
-        row3Slider.maxValue *= conversion;
-
-        // Convert the actual slider positions
-        row1Slider.value *= conversion;
-        row2Slider.value *= conversion;
-        row3Slider.value *= conversion;
-
+        isSystemUpdating = true; 
         currentUnit = newUnit;
+
+        row1Slider.minValue = -9999f; row1Slider.maxValue = 9999f;
+        row2Slider.minValue = -9999f; row2Slider.maxValue = 9999f;
+        row3Slider.minValue = -9999f; row3Slider.maxValue = 9999f;
+
+        float newMult = GetMultiplierToMeters(currentUnit);
+        row1Slider.value = currentSizeMetersX / newMult;
+        row2Slider.value = currentSizeMetersY / newMult;
+        row3Slider.value = currentSizeMetersZ / newMult;
+
+        float absoluteMax = 3.0f / newMult;
+        float absoluteMin = 0.01f / newMult;
+
+        row1Slider.minValue = absoluteMin; row1Slider.maxValue = absoluteMax;
+        row2Slider.minValue = absoluteMin; row2Slider.maxValue = absoluteMax;
+        row3Slider.minValue = absoluteMin; row3Slider.maxValue = absoluteMax;
+
         ToggleUnitMenu(); 
         isSystemUpdating = false;
-        OnSliderMoved(); // Push new accurate numbers
+        OnSliderMoved(); 
+        AnimateUnitTexts();
+        
+    }
+
+    // NEW: The Scale Punch animation for unit changes
+    private void AnimateUnitTexts()
+    {
+        float punchAmount = 0.2f; // Makes the text grow by 20%
+        float duration = 0.3f;    // Snaps back in 0.3 seconds
+
+        // DOKill(true) forces the text back to normal size instantly if the user spams the button, 
+        // preventing the text from permanently growing out of control!
+        
+        // 1. Pop the top dashboard texts
+        dashRow1Txt.transform.DOKill(true);
+        dashRow1Txt.transform.DOPunchScale(Vector3.one * punchAmount, duration, 5, 1);
+        
+        dashVolumeTxt.transform.DOKill(true);
+        dashVolumeTxt.transform.DOPunchScale(Vector3.one * punchAmount, duration, 5, 1);
+
+        if (row2.activeSelf)
+        {
+            dashRow2Txt.transform.DOKill(true);
+            dashRow2Txt.transform.DOPunchScale(Vector3.one * punchAmount, duration, 5, 1);
+        }
+        if (row3.activeSelf)
+        {
+            dashRow3Txt.transform.DOKill(true);
+            dashRow3Txt.transform.DOPunchScale(Vector3.one * punchAmount, duration, 5, 1);
+        }
+
+        // 2. Pop the input boxes on the bottom sliders
+        if (row1.activeSelf && row1Input != null) 
+        {
+            row1Input.transform.DOKill(true);
+            row1Input.transform.DOPunchScale(Vector3.one * punchAmount, duration, 5, 1);
+        }
+        if (row2.activeSelf && row2Input != null) 
+        {
+            row2Input.transform.DOKill(true);
+            row2Input.transform.DOPunchScale(Vector3.one * punchAmount, duration, 5, 1);
+        }
+        if (row3.activeSelf && row3Input != null) 
+        {
+            row3Input.transform.DOKill(true);
+            row3Input.transform.DOPunchScale(Vector3.one * punchAmount, duration, 5, 1);
+        }
+        if (arController != null)
+        {
+            arController.Animate3DLabels();
+        }
+    }
+
+    private void SetAbsoluteSliderBoundsAndValue(float defaultSizeMeters)
+    {
+        float mult = GetMultiplierToMeters(currentUnit);
+        
+        row1Slider.minValue = -9999f; row1Slider.maxValue = 9999f;
+        row2Slider.minValue = -9999f; row2Slider.maxValue = 9999f;
+        row3Slider.minValue = -9999f; row3Slider.maxValue = 9999f;
+
+        row1Slider.value = defaultSizeMeters / mult;
+        row2Slider.value = defaultSizeMeters / mult;
+        row3Slider.value = defaultSizeMeters / mult;
+
+        float absoluteMax = 3.0f / mult;
+        float absoluteMin = 0.01f / mult;
+
+        row1Slider.minValue = absoluteMin; row1Slider.maxValue = absoluteMax;
+        row2Slider.minValue = absoluteMin; row2Slider.maxValue = absoluteMax;
+        row3Slider.minValue = absoluteMin; row3Slider.maxValue = absoluteMax;
     }
 
     public float GetMultiplierToMeters(string unit)
@@ -195,8 +370,16 @@ public class ARUIManager : MonoBehaviour
 
     public void ResetUI()
     {
+        isSolidPlaced = false; 
         isUIVisible = false;
         if (hideableUIGroup != null) hideableUIGroup.SetActive(false);
         if (unitFlyoutMenu != null) unitFlyoutMenu.SetActive(false);
+    }
+
+    private CanvasGroup GetOrAddCanvasGroup(GameObject obj)
+    {
+        CanvasGroup cg = obj.GetComponent<CanvasGroup>();
+        if (cg == null) cg = obj.AddComponent<CanvasGroup>();
+        return cg;
     }
 }

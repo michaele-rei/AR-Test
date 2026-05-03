@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
+using DG.Tweening;
 
 public class ARController : MonoBehaviour
 {
@@ -36,8 +37,6 @@ public class ARController : MonoBehaviour
 
     private bool isShowcasing = false;
     private float showcaseTimer = 0f;
-    
-    // ISSUE 3 FIX: A memory lock so we don't repeat the showcase!
     private bool hasSeenShowcase = false; 
 
     void Start()
@@ -113,10 +112,21 @@ public class ARController : MonoBehaviour
     {
         if (volumeLabelPrefab == null) return;
         volumeLabelObj = Instantiate(volumeLabelPrefab, spawnedObject.transform);
-        volumeLabelObj.transform.localPosition = localPos;
+        
+        float absoluteTextSize = 0.025f; 
+        Vector3 pScale = spawnedObject.transform.localScale;
+        
+        // FIX: The same Infinity crash safety net!
+        float safeX = Mathf.Max(Mathf.Abs(pScale.x), 0.001f);
+        float safeY = Mathf.Max(Mathf.Abs(pScale.y), 0.001f);
+        float safeZ = Mathf.Max(Mathf.Abs(pScale.z), 0.001f);
+
+        volumeLabelObj.transform.localScale = new Vector3(absoluteTextSize / safeX, absoluteTextSize / safeY, absoluteTextSize / safeZ);
+
+        float worldHeightOffset = (scaleRef / 2f) + 0.08f; 
+        volumeLabelObj.transform.position = spawnedObject.transform.position + new Vector3(0, worldHeightOffset, 0);
+        
         volumeLabelObj.GetComponent<TextMeshPro>().text = text;
-        if (scaleRef < 0.1f) scaleRef = 0.1f;
-        volumeLabelObj.transform.localScale = Vector3.one * (1f / scaleRef) * 0.125f;
     }
 
     void SpawnGhost(Vector2 touchPos)
@@ -135,6 +145,7 @@ public class ARController : MonoBehaviour
         }
 
         spawnedObject = Instantiate(prefabToUse, hitPose.position, hitPose.rotation);
+        ApplyThemeMaterial(spawnedObject);
         Vector3 lookPos = new Vector3(Camera.main.transform.position.x, spawnedObject.transform.position.y, Camera.main.transform.position.z);
         spawnedObject.transform.LookAt(lookPos);
     }
@@ -157,22 +168,33 @@ public class ARController : MonoBehaviour
         if (ExerciseManager.isExerciseMode)
         {
             SetupExerciseVisuals();
+            DoSpawnAnimation(); // Play animation for exercises too
         }
         else
         {
-            // ISSUE 3 FIX: Only play the showcase if they haven't seen it yet
+            // 1. Let the UI set the absolute mathematical size FIRST
+            if (uiManager != null) uiManager.SetupUIForShape(selectedShape);
+
+            // 2. Play the pop animation using that exact size
+            DoSpawnAnimation();
+
+            // 3. Delay the showcase so it doesn't fight the DOTween animation!
             if (!hasSeenShowcase)
             {
-                isShowcasing = true;
-                showcaseTimer = 0f;
-                hasSeenShowcase = true; // Lock it for future placements
+                DOVirtual.DelayedCall(0.6f, () => 
+                {
+                    if (isPlaced) // Safety check in case they reset really fast
+                    {
+                        isShowcasing = true;
+                        showcaseTimer = 0f;
+                        hasSeenShowcase = true; 
+                    }
+                });
             }
             else
             {
                 isShowcasing = false;
             }
-
-            if (uiManager != null) uiManager.SetupUIForShape(selectedShape);
         }
     }
 
@@ -204,55 +226,72 @@ public class ARController : MonoBehaviour
             spawnedObject.transform.localScale = Vector3.one * x;
             volume = Mathf.Pow(x, 3);
             Vector3 p = new Vector3(-0.5f, -0.5f, -0.5f);
-            CreateDimension(p, new Vector3(0.5f, -0.5f, -0.5f), new Vector3(0, -0.05f, -0.05f), $"s = {dX:F2}{u}");
-            CreateVolumeLabel($"Vol: {(volume / Mathf.Pow(mult, 3)):F2}{u}³", x, volumeLabelPos);
+            
+            // FIX: Add 3 dimension lines for the Cube (Length, Height, Width)!
+            CreateDimension(p, new Vector3(0.5f, -0.5f, -0.5f), new Vector3(0, -0.05f, -0.05f), $"s = {dX:F2} {u}"); 
+            CreateDimension(p, new Vector3(-0.5f, 0.5f, -0.5f), new Vector3(-0.05f, 0, -0.05f), $"s = {dX:F2} {u}"); 
+            CreateDimension(p, new Vector3(-0.5f, -0.5f, 0.5f), new Vector3(-0.05f, -0.05f, 0), $"s = {dX:F2} {u}"); 
+            
+            CreateVolumeLabel($"Vol: {(volume / Mathf.Pow(mult, 3)):F2} {u}³", x, volumeLabelPos);
         }
         else if (selectedShape == "Sphere")
         {
             spawnedObject.transform.localScale = Vector3.one * x;
             float r = x / 2f;
             volume = (4f / 3f) * Mathf.PI * Mathf.Pow(r, 3);
-            CreateDimension(Vector3.zero, new Vector3(0.5f, 0, 0), Vector3.zero, $"r = {(dX/2f):F2}{u}");
-            CreateVolumeLabel($"Vol: {(volume / Mathf.Pow(mult, 3)):F2}{u}³", x, volumeLabelPos);
+            
+            // FIX: Moved the dimension line slightly ABOVE the sphere so it doesn't hide inside the solid model
+            CreateDimension(Vector3.zero, new Vector3(0.5f, 0, 0), new Vector3(0, 0.55f, 0), $"r = {(dX/2f):F2} {u}");
+            CreateVolumeLabel($"Vol: {(volume / Mathf.Pow(mult, 3)):F2} {u}³", x, volumeLabelPos);
         }
         else if (selectedShape == "Cylinder")
         {
             spawnedObject.transform.localScale = new Vector3(x, y / 2f, x);
             float r = x / 2f;
             volume = Mathf.PI * Mathf.Pow(r, 2) * y;
-            CreateDimension(new Vector3(0, 1f, 0), new Vector3(0.5f, 1f, 0), new Vector3(0, 0.1f, 0), $"r = {(dX/2f):F2}{u}");
-            CreateDimension(new Vector3(-0.5f, -1f, 0), new Vector3(-0.5f, 1f, 0), new Vector3(-0.1f, 0, 0), $"h = {dY:F2}{u}");
-            CreateVolumeLabel($"Vol: {(volume / Mathf.Pow(mult, 3)):F2}{u}³", (x+y)/2f, volumeLabelPos);
+            CreateDimension(new Vector3(0, 1f, 0), new Vector3(0.5f, 1f, 0), new Vector3(0, 0.1f, 0), $"r = {(dX/2f):F2} {u}");
+            CreateDimension(new Vector3(-0.5f, -1f, 0), new Vector3(-0.5f, 1f, 0), new Vector3(-0.1f, 0, 0), $"h = {dY:F2} {u}");
+            CreateVolumeLabel($"Vol: {(volume / Mathf.Pow(mult, 3)):F2} {u}³", (x+y)/2f, volumeLabelPos);
         }
         else if (selectedShape == "Cone")
         {
             spawnedObject.transform.localScale = new Vector3(x, y, x);
             float r = x / 2f;
             volume = (1f / 3f) * Mathf.PI * Mathf.Pow(r, 2) * y;
-            CreateDimension(new Vector3(0, 0.5f, 0), new Vector3(0.5f, 0.5f, 0), new Vector3(0, 0.05f, 0), $"r = {(dX/2f):F2}{u}");
-            CreateDimension(new Vector3(0, -0.5f, 0), new Vector3(0, 0.5f, 0), new Vector3(0.6f, 0, 0), $"h = {dY:F2}{u}");
-            CreateVolumeLabel($"Vol: {(volume / Mathf.Pow(mult, 3)):F2}{u}³", (x+y)/2f, volumeLabelPos);
+            CreateDimension(new Vector3(0, 0.5f, 0), new Vector3(0.5f, 0.5f, 0), new Vector3(0, 0.05f, 0), $"r = {(dX/2f):F2} {u}");
+            CreateDimension(new Vector3(0, -0.5f, 0), new Vector3(0, 0.5f, 0), new Vector3(0.6f, 0, 0), $"h = {dY:F2} {u}");
+            CreateVolumeLabel($"Vol: {(volume / Mathf.Pow(mult, 3)):F2} {u}³", (x+y)/2f, volumeLabelPos);
         }
         else if (selectedShape == "Pyramid")
         {
             spawnedObject.transform.localScale = new Vector3(x, y, x);
             volume = (1f / 3f) * Mathf.Pow(x, 2) * y;
-            CreateDimension(new Vector3(-0.5f, -0.5f, -0.5f), new Vector3(0.5f, -0.5f, -0.5f), new Vector3(0, 0.02f, -0.1f), $"b = {dX:F2}{u}");
-            CreateDimension(new Vector3(0, -0.5f, 0), new Vector3(0, 0.5f, 0), new Vector3(0.6f, 0, 0), $"h = {dY:F2}{u}");
-            CreateVolumeLabel($"Vol: {(volume / Mathf.Pow(mult, 3)):F2}{u}³", (x+y)/2f, volumeLabelPos);
+            
+            // Start at the bottom-left-front corner
+            Vector3 p = new Vector3(-0.5f, -0.5f, -0.5f); 
+            
+            // FIX: Added a second dimension line for the side of the base
+            CreateDimension(p, new Vector3(0.5f, -0.5f, -0.5f), new Vector3(0, -0.05f, -0.05f), $"b = {dX:F2} {u}"); // Front edge
+            CreateDimension(p, new Vector3(-0.5f, -0.5f, 0.5f), new Vector3(-0.05f, -0.05f, 0), $"b = {dX:F2} {u}"); // Side edge
+            
+            // Height line
+            CreateDimension(new Vector3(0, -0.5f, 0), new Vector3(0, 0.5f, 0), new Vector3(0.6f, 0, 0), $"h = {dY:F2} {u}");
+            
+            CreateVolumeLabel($"Vol: {(volume / Mathf.Pow(mult, 3)):F2} {u}³", (x+y)/2f, volumeLabelPos);
         }
         else // Rectangular Prism
         {
             spawnedObject.transform.localScale = new Vector3(x, y, z);
             volume = x * y * z;
             Vector3 p = new Vector3(-0.5f, -0.5f, -0.5f);
-            CreateDimension(p, new Vector3(0.5f, -0.5f, -0.5f), new Vector3(0, -0.05f, -0.05f), $"L={dX:F1}{u}");
-            CreateDimension(p, new Vector3(-0.5f, 0.5f, -0.5f), new Vector3(-0.05f, 0, -0.05f), $"H={dY:F1}{u}");
-            CreateDimension(p, new Vector3(-0.5f, -0.5f, 0.5f), new Vector3(-0.05f, -0.05f, 0), $"W={dZ:F1}{u}");
-            CreateVolumeLabel($"Vol: {(volume / Mathf.Pow(mult, 3)):F2}{u}³", (x+y+z)/3f, volumeLabelPos);
+            CreateDimension(p, new Vector3(0.5f, -0.5f, -0.5f), new Vector3(0, -0.05f, -0.05f), $"L={dX:F1} {u}");
+            CreateDimension(p, new Vector3(-0.5f, 0.5f, -0.5f), new Vector3(-0.05f, 0, -0.05f), $"H={dY:F1} {u}");
+            CreateDimension(p, new Vector3(-0.5f, -0.5f, 0.5f), new Vector3(-0.05f, -0.05f, 0), $"W={dZ:F1} {u}");
+            CreateVolumeLabel($"Vol: {(volume / Mathf.Pow(mult, 3)):F2} {u}³", (x+y+z)/3f, volumeLabelPos);
         }
 
         if (uiManager != null) uiManager.UpdateDashboardVolume(volume);
+        BillboardLabels();
     }
 
     Pose GetPlanePosition(Vector2 touchPos)
@@ -327,5 +366,85 @@ public class ARController : MonoBehaviour
     public void ExitAR()
     {
         SceneManager.LoadScene(ExerciseManager.isExerciseMode ? "AR_Exercises" : "AR_Learning");
+    }
+    void DoSpawnAnimation()
+    {
+        if (spawnedObject == null) return;
+
+        Vector3 finalScale = spawnedObject.transform.localScale;
+        spawnedObject.transform.localScale = Vector3.zero;
+        spawnedObject.transform.DOScale(finalScale, 0.5f).SetEase(Ease.OutBack).SetLink(spawnedObject);
+
+        if (volumeLabelObj != null)
+        {
+            Vector3 volScale = volumeLabelObj.transform.localScale;
+            volumeLabelObj.transform.localScale = Vector3.zero;
+            volumeLabelObj.transform.DOScale(volScale, 0.4f).SetEase(Ease.OutBack).SetDelay(0.2f).SetLink(volumeLabelObj);
+        }
+
+        foreach (var dim in activeDimensions)
+        {
+            if (dim != null)
+            {
+                Vector3 dimScale = dim.transform.localScale;
+                dim.transform.localScale = Vector3.zero;
+                dim.transform.DOScale(dimScale, 0.4f).SetEase(Ease.OutBack).SetDelay(0.1f).SetLink(dim.gameObject);
+            }
+        }
+    }
+
+    public void Animate3DLabels()
+    {
+        if (spawnedObject == null) return;
+
+        float punchIntensity = 0.3f; // Bounces by 30% of its current size
+        float duration = 0.3f;
+
+        // 1. Bounce the Volume Label
+        if (volumeLabelObj != null)
+        {
+            volumeLabelObj.transform.DOKill(true);
+            Vector3 currentScale = volumeLabelObj.transform.localScale;
+            volumeLabelObj.transform.DOPunchScale(currentScale * punchIntensity, duration, 5, 1).SetLink(volumeLabelObj);
+        }
+
+        // 2. Bounce all active Dimension Lines & Texts
+        if (activeDimensions != null)
+        {
+            foreach (var dim in activeDimensions)
+            {
+                if (dim != null)
+                {
+                    dim.transform.DOKill(true);
+                    Vector3 dimScale = dim.transform.localScale;
+                    dim.transform.DOPunchScale(dimScale * punchIntensity, duration, 5, 1).SetLink(dim.gameObject);
+                }
+            }
+        }
+    }
+
+    void ApplyThemeMaterial(GameObject obj)
+    {
+        // Find all the 3D meshes inside the prefab
+        Renderer[] renderers = obj.GetComponentsInChildren<Renderer>();
+        
+        Material themeMat = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+        
+        // Set to a soft, friendly UI Blue (R: 110, G: 130, B: 240)
+        themeMat.color = new Color(0.43f, 0.51f, 0.94f); 
+        
+        // Give it a subtle "plastic toy" shine (great for elementary kids!)
+        themeMat.SetFloat("_Glossiness", 0.4f);
+        themeMat.SetFloat("_Metallic", 0.0f);
+
+        // Apply it to every piece of the shape
+        foreach (Renderer r in renderers)
+        {
+            // CRITICAL: We skip the LineRenderers so we don't accidentally paint your yellow dimension lines blue!
+            if (!(r is LineRenderer)) 
+            {
+                r.material = themeMat;
+            }
+        }
     }
 }

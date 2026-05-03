@@ -1,74 +1,54 @@
 using UnityEngine;
 using TMPro;
 
+[RequireComponent(typeof(LineRenderer))]
 public class DimensionBuilder : MonoBehaviour
 {
-    public LineRenderer lineRenderer;
-    public TextMeshPro textMesh;
+    public TextMeshPro labelText;
+    private LineRenderer lineRenderer;
 
-    // We store the original configuration so we can refresh it
-    private Vector3 _start, _end, _offset;
-
-    public void Configure(Vector3 start, Vector3 end, Vector3 offsetDir, string textValue)
+    void Awake()
     {
-        _start = start;
-        _end = end;
-        _offset = offsetDir;
-
-        UpdateText(textValue);
+        lineRenderer = GetComponent<LineRenderer>();
+        
+        // 1. Force the line to look clean, unlit, and exactly 5mm thick
+        lineRenderer.startWidth = 0.005f; 
+        lineRenderer.endWidth = 0.005f;
+        lineRenderer.positionCount = 2;
+        lineRenderer.useWorldSpace = true; // CRITICAL: This stops the line from getting "fat" when scaled
+        
+        // 2. Give it a clean, unlit material so it doesn't look dark or muddy
+        Material unlitMat = new Material(Shader.Find("Sprites/Default"));
+        lineRenderer.material = unlitMat;
+        lineRenderer.startColor = Color.yellow;
+        lineRenderer.endColor = Color.yellow;
     }
 
-    // Helper to just change the text number (e.g. "2.0m" -> "2.5m")
-    public void UpdateText(string textValue)
+    public void Configure(Vector3 localStart, Vector3 localEnd, Vector3 localOffset, string text)
     {
-        if (textMesh != null) textMesh.text = textValue;
-        RefreshVisuals(); // Re-calculate positions
-    }
+        Transform parentSolid = transform.parent;
 
-    void Update()
-    {
-        // constantly fix the size if the parent is scaling (Learning Mode)
-        if (transform.parent != null && transform.parent.hasChanged)
+        Vector3 worldStart = parentSolid.TransformPoint(localStart + localOffset);
+        Vector3 worldEnd = parentSolid.TransformPoint(localEnd + localOffset);
+
+        lineRenderer.SetPosition(0, worldStart);
+        lineRenderer.SetPosition(1, worldEnd);
+
+        if (labelText != null)
         {
-            RefreshVisuals();
-        }
-    }
-
-    void RefreshVisuals()
-    {
-        // 1. Calculate Floating Positions
-        Vector3 lineStart = _start + _offset;
-        Vector3 lineEnd   = _end + _offset;
-
-        // 2. Draw Line
-        if (lineRenderer != null)
-        {
-            lineRenderer.positionCount = 2;
-            lineRenderer.SetPositions(new Vector3[] { lineStart, lineEnd });
-        }
-
-        // 3. Place Text
-        if (textMesh != null)
-        {
-            textMesh.transform.localPosition = (lineStart + lineEnd) / 2f;
-        }
-
-        // 4. FIX SCALING (The Magic Part)
-        if (transform.parent != null)
-        {
-            // Get the average scale of the parent
-            float parentAvgScale = (transform.parent.localScale.x + transform.parent.localScale.y) / 2f;
+            labelText.text = text;
+            float absoluteTextSize = 0.02f;
+            Vector3 pScale = parentSolid.localScale;
             
-            // Protect against zero division
-            if (parentAvgScale < 0.001f) parentAvgScale = 0.001f;
+            // FIX: Safety net! Force the scale to be at least 0.001 so we NEVER divide by zero.
+            float safeX = Mathf.Max(Mathf.Abs(pScale.x), 0.001f);
+            float safeY = Mathf.Max(Mathf.Abs(pScale.y), 0.001f);
+            float safeZ = Mathf.Max(Mathf.Abs(pScale.z), 0.001f);
 
-            // Keep line thin (0.015 constant)
-            if (lineRenderer != null) 
-                lineRenderer.widthMultiplier = 0.015f / parentAvgScale;
+            labelText.transform.localScale = new Vector3(absoluteTextSize / safeX, absoluteTextSize / safeY, absoluteTextSize / safeZ);
 
-            // Keep text small (0.05 constant)
-            if (textMesh != null)
-                textMesh.transform.localScale = Vector3.one * (1f / parentAvgScale) * 0.05f;
+            Vector3 midPoint = Vector3.Lerp(worldStart, worldEnd, 0.5f);
+            labelText.transform.position = midPoint + new Vector3(0, 0.02f, 0); 
         }
     }
 }
