@@ -14,7 +14,14 @@ public class ButtonScript : MonoBehaviour
     public void StartGame()
     {
         // Use this button on the Main Menu to go to the Textbook
-        SceneManager.LoadScene("AR_Learning");
+        if (SceneFader.Instance != null)
+        {
+            SceneFader.Instance.LoadSceneSmoothly("AR_Learning"); 
+        }
+        else
+        {
+            SceneManager.LoadScene("AR_Learning"); // Fallback
+        }
     }
 
     public void QuitApp()
@@ -24,15 +31,6 @@ public class ButtonScript : MonoBehaviour
     }
 
     // --- TEXTBOOK FUNCTIONS ---
-    void Start()
-    {
-        // This runs automatically every time the scene loads.
-        // It checks: "Do I have pages assigned?" If yes, reset to the Cube.
-        if (pageCube != null && pageSphere != null)
-        {
-            GoToCube(); // Force the app to start on the Cube page
-        }
-    }
     
     public void GoToSphere()
     {
@@ -53,17 +51,42 @@ public class ButtonScript : MonoBehaviour
 
     public void BackToMenu()
     {
-        SceneManager.LoadScene("MainMenu");
+        // FIX: Removed the .Instance check!
+        ExerciseManager.isExerciseMode = false;
+
+        if (SceneFader.Instance != null)
+        {
+            SceneFader.Instance.LoadSceneSmoothly("MainMenu"); 
+        }
+        else
+        {
+            SceneManager.LoadScene("MainMenu"); // Fallback
+        }
     }
 
     // --- AR FUNCTIONS ---
+    // --- AR FUNCTIONS ---
     public void LaunchAR()
     {
-        SceneManager.LoadScene("AR_Environment"); 
+        if (SceneFader.Instance != null)
+        {
+            SceneFader.Instance.LoadSceneSmoothly("AR_Environment"); 
+        }
+        else
+        {
+            SceneManager.LoadScene("AR_Environment"); // Fallback
+        }
     }
 
     public void LaunchExercise()
     {
-        SceneManager.LoadScene("AR_Exercises"); 
+        if (SceneFader.Instance != null)
+        {
+            SceneFader.Instance.LoadSceneSmoothly("AR_Exercises"); 
+        }
+        else
+        {
+            SceneManager.LoadScene("AR_Exercises"); // Fallback
+        }
     }
 }
