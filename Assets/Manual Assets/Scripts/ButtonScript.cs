@@ -37,25 +37,6 @@ public class ButtonScript : MonoBehaviour
         Debug.Log("App Quitting...");
     }
 
-    // --- TEXTBOOK FUNCTIONS ---
-    
-    public void GoToSphere()
-    {
-        // We add this check so it doesn't crash if we use it in the wrong scene
-        if (pageCube != null) pageCube.SetActive(false);
-        if (pageSphere != null) pageSphere.SetActive(true);
-        
-        selectedShape = "Sphere";
-    }
-
-    public void GoToCube()
-    {
-        if (pageSphere != null) pageSphere.SetActive(false);
-        if (pageCube != null) pageCube.SetActive(true);
-        
-        selectedShape = "Cube";
-    }
-
     public void BackToMenu()
     {
         // FIX: Removed the .Instance check!

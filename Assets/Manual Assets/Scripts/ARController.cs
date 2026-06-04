@@ -6,12 +6,13 @@ using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
 using DG.Tweening;
+using UnityEngine.EventSystems; // REQUIRED FOR UI BLOCKER
 
 public class ARController : MonoBehaviour
 {
     [Header("Spawnable Objects")]
-    public GameObject cuboidPrefab;          // UPDATED: Replaced Cube
-    public GameObject triangularPrismPrefab; // UPDATED: Replaced Rectangular Prism
+    public GameObject cuboidPrefab;
+    public GameObject triangularPrismPrefab;
     public GameObject pyramidPrefab;
     public GameObject conePrefab;
     public GameObject cylinderPrefab;
@@ -29,12 +30,6 @@ public class ARController : MonoBehaviour
     public GameObject dimensionPrefab;
     public GameObject volumeLabelPrefab;
 
-    [Header("Primary Colors System")]
-    public Material matRed;
-    public Material matGreen;
-    public Material matYellow;
-    private Material currentSelectedMaterial;
-
     [Header("Code-Driven Color System")]
     private Color currentSelectedColor = Color.red;
 
@@ -50,9 +45,7 @@ public class ARController : MonoBehaviour
 
     void Start()
     {
-        // Default to Red if they haven't picked a color yet
-        currentSelectedMaterial = matRed;
-        // NEW: Forces AR Foundation to completely reset the camera/simulator pipe on load!
+        // Forces AR Foundation to completely reset the camera/simulator pipe on load!
         if (LoaderUtility.GetActiveLoader() != null) { LoaderUtility.GetActiveLoader().Initialize(); }
 
         selectedShape = string.IsNullOrEmpty(ButtonScript.selectedShape) ? "Cube" : ButtonScript.selectedShape;
@@ -64,31 +57,59 @@ public class ARController : MonoBehaviour
 
     void Update()
     {
+        // 1. If the shape is completely locked in, run the showcase and stop!
         if (isPlaced && spawnedObject != null)
         {
             if (isShowcasing) AnimateShowcase();
             BillboardLabels();
-            return;
+            return; 
         }
 
+        // 2. Track the finger for Spawning, Dragging, and Releasing
         if (!isPlaced && Input.touchCount > 0)
         {
             Touch touch = Input.GetTouch(0);
 
+            // UI Blocker: Only block the initial tap! (Allows you to drag underneath UI menus without freezing)
+            if (touch.phase == TouchPhase.Began && IsPointerOverUI()) return; 
+
+            // TAP: Spawn the shape
             if (touch.phase == TouchPhase.Began)
             {
-                if (IsTouchingUI(touch)) return;
                 SpawnGhost(touch.position);
             }
+            // DRAG: Move the shape around the table
             else if (touch.phase == TouchPhase.Moved && spawnedObject != null)
             {
                 MoveGhost(touch.position);
             }
+            // LET GO: Lock it permanently!
             else if ((touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled) && spawnedObject != null)
             {
                 FinalizePlacement();
             }
         }
+    }
+
+    // This checks for both Mouse Clicks (Simulator) and Physical Touches (iPhone)
+    private bool IsPointerOverUI()
+    {
+        if (EventSystem.current == null) return false;
+
+        // 1. Check for Physical Device Touches
+        if (Input.touchCount > 0)
+        {
+            return EventSystem.current.IsPointerOverGameObject(Input.touches[0].fingerId);
+        }
+
+        // 2. Check for Simulator / Editor Mouse Clicks
+        // ONLY block if we are actually clicking the mouse, not just hovering!
+        if (Input.GetMouseButton(0) || Input.GetMouseButtonDown(0))
+        {
+            return EventSystem.current.IsPointerOverGameObject();
+        }
+
+        return false;
     }
 
     void BillboardLabels()
@@ -144,37 +165,73 @@ public class ARController : MonoBehaviour
 
     void SpawnGhost(Vector2 touchPos)
     {
-        Pose hitPose = GetPlanePosition(touchPos);
-        if (hitPose == Pose.identity) return;
+        // THE ANTI-DUPLICATE LOCK: If a shape already exists, absolutely do not spawn another one!
+        if (spawnedObject != null) return; 
 
-        // UPDATED: Now checks for Cuboid and TriangularPrism
-        GameObject prefabToUse = cuboidPrefab; 
-        switch (selectedShape)
+        Vector3 planePosition;
+        
+        // Call the safe raycast function
+        if (GetPlanePosition(touchPos, out planePosition))
         {
-            case "TriangularPrism": prefabToUse = triangularPrismPrefab; break;
-            case "Pyramid": prefabToUse = pyramidPrefab; break;
-            case "Cone": prefabToUse = conePrefab; break;
-            case "Cylinder": prefabToUse = cylinderPrefab; break;
-            case "Sphere": prefabToUse = spherePrefab; break;
-            case "Cuboid": prefabToUse = cuboidPrefab; break;
+            GameObject prefabToUse = cuboidPrefab; 
+            switch (selectedShape)
+            {
+                case "TriangularPrism": prefabToUse = triangularPrismPrefab; break;
+                case "Pyramid": prefabToUse = pyramidPrefab; break;
+                case "Cone": prefabToUse = conePrefab; break;
+                case "Cylinder": prefabToUse = cylinderPrefab; break;
+                case "Sphere": prefabToUse = spherePrefab; break;
+                case "Cuboid": prefabToUse = cuboidPrefab; break;
+            }
+
+            // Spawn it and paint it instantly!
+            spawnedObject = Instantiate(prefabToUse, planePosition, Quaternion.identity);
+            ApplyColorToMesh();
+
+            Vector3 lookPos = new Vector3(Camera.main.transform.position.x, spawnedObject.transform.position.y, Camera.main.transform.position.z);
+            spawnedObject.transform.LookAt(lookPos);
         }
-
-        spawnedObject = Instantiate(prefabToUse, hitPose.position, hitPose.rotation);
-        ApplyColorToMesh();
-
-        ChangeSpawnedColor(currentSelectedMaterial);
-
-        Vector3 lookPos = new Vector3(Camera.main.transform.position.x, spawnedObject.transform.position.y, Camera.main.transform.position.z);
-        spawnedObject.transform.LookAt(lookPos);
     }
-
+    
     void MoveGhost(Vector2 touchPos)
     {
-        Pose hitPose = GetPlanePosition(touchPos);
-        if (hitPose != Pose.identity)
+        Vector3 planePosition;
+        
+        // If the finger is still dragging over a valid floor plane, move the shape!
+        if (GetPlanePosition(touchPos, out planePosition))
         {
-            spawnedObject.transform.position = Vector3.Lerp(spawnedObject.transform.position, hitPose.position, 0.2f);
+            // Lerp makes the drag feel smooth instead of jittery
+            spawnedObject.transform.position = Vector3.Lerp(spawnedObject.transform.position, planePosition, 0.2f);
         }
+    }
+
+    // Bulletproof Raycast logic
+    private bool GetPlanePosition(Vector2 touchPos, out Vector3 position)
+    {
+        position = Vector3.zero;
+
+        if (raycastManager == null)
+        {
+            raycastManager = GetComponent<ARRaycastManager>();
+            if (raycastManager == null) raycastManager = FindObjectOfType<ARRaycastManager>();
+            if (raycastManager == null)
+            {
+                Debug.LogError("AR_ERROR: ARRaycastManager is missing from the scene!");
+                return false;
+            }
+        }
+
+        List<ARRaycastHit> hits = new List<ARRaycastHit>();
+        if (raycastManager.Raycast(touchPos, hits, TrackableType.PlaneWithinPolygon))
+        {
+            if (hits.Count > 0)
+            {
+                position = hits[0].pose.position;
+                return true;
+            }
+        }
+
+        return false;
     }
 
     void FinalizePlacement()
@@ -234,7 +291,6 @@ public class ARController : MonoBehaviour
         float dY = y / mult; 
         float dZ = z / mult;
 
-        // --- UPDATED: Cuboid Logic ---
         if (selectedShape == "Cuboid")
         {
             spawnedObject.transform.localScale = new Vector3(x, y, z);
@@ -247,19 +303,14 @@ public class ARController : MonoBehaviour
             
             CreateVolumeLabel($"Vol: {(volume / Mathf.Pow(mult, 3)):F2} {u}³", (x+y+z)/3f, volumeLabelPos);
         }
-        // --- UPDATED: Triangular Prism Logic ---
         else if (selectedShape == "TriangularPrism")
         {
             spawnedObject.transform.localScale = new Vector3(x, y, z);
-            volume = 0.5f * x * y * z; // Area of triangle base (0.5 * b * h) * length
+            volume = 0.5f * x * y * z; 
 
             Vector3 p = new Vector3(-0.5f, -0.5f, -0.5f);
-            
-            // Base of the triangle (X-axis)
             CreateDimension(p, new Vector3(0.5f, -0.5f, -0.5f), new Vector3(0, -0.05f, -0.05f), $"b = {dX:F2} {u}");
-            // Height of the triangle (Y-axis)
             CreateDimension(p, new Vector3(-0.5f, 0.5f, -0.5f), new Vector3(-0.05f, 0, 0), $"h = {dY:F2} {u}");
-            // Length of the prism (Z-axis)
             CreateDimension(p, new Vector3(-0.5f, -0.5f, 0.5f), new Vector3(-0.05f, -0.05f, 0), $"L = {dZ:F2} {u}");
 
             CreateVolumeLabel($"Vol: {(volume / Mathf.Pow(mult, 3)):F2} {u}³", (x+y+z)/3f, volumeLabelPos);
@@ -308,13 +359,6 @@ public class ARController : MonoBehaviour
         BillboardLabels();
     }
 
-    Pose GetPlanePosition(Vector2 touchPos)
-    {
-        List<ARRaycastHit> hits = new List<ARRaycastHit>();
-        if (raycastManager.Raycast(touchPos, hits, TrackableType.PlaneWithinPolygon)) return hits[0].pose;
-        return Pose.identity;
-    }
-
     void TogglePlaneDetection(bool status)
     {
         if (planeManager != null)
@@ -330,14 +374,13 @@ public class ARController : MonoBehaviour
         if (spawnedObject != null) { Destroy(spawnedObject); spawnedObject = null; }
         ClearOldLabels();
         isPlaced = false;
+        
+        // NEW: Force the app to forget the animation so it can play again!
+        hasSeenShowcase = false; 
+        
         TogglePlaneDetection(true);
         if (promptText != null) promptText.SetActive(true);
         if (uiManager != null) uiManager.ResetUI();
-    }
-
-    bool IsTouchingUI(Touch t)
-    {
-        return UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject(t.fingerId);
     }
 
     void SetupExerciseVisuals()
@@ -345,17 +388,15 @@ public class ARController : MonoBehaviour
         ClearOldLabels();
         Vector3 defaultLabelPos = new Vector3(0, 0.7f, 0);
 
-        // 1. Give everything a standard AR scale to start
         spawnedObject.transform.localScale = new Vector3(0.4f, 0.4f, 0.4f);
 
-        // 2. Draw the correct lines based on the shape
         if (selectedShape == "Sphere")
         {
             CreateDimension(Vector3.zero, new Vector3(0.5f, 0, 0), new Vector3(0, 0.55f, 0), "Radius");
         }
         else if (selectedShape == "Cylinder")
         {
-            spawnedObject.transform.localScale = new Vector3(0.4f, 0.2f, 0.4f); // Slightly squatter cylinder looks better
+            spawnedObject.transform.localScale = new Vector3(0.4f, 0.2f, 0.4f); 
             CreateDimension(new Vector3(0, 1f, 0), new Vector3(0.5f, 1f, 0), new Vector3(0, 0.1f, 0), "Radius");
             CreateDimension(new Vector3(-0.5f, -1f, 0), new Vector3(-0.5f, 1f, 0), new Vector3(-0.1f, 0, 0), "Height");
         }
@@ -378,16 +419,14 @@ public class ARController : MonoBehaviour
             CreateDimension(p, new Vector3(-0.5f, -0.5f, 0.5f), new Vector3(-0.05f, -0.05f, 0), "Base"); 
             CreateDimension(new Vector3(0, -0.5f, 0), new Vector3(0, 0.5f, 0), new Vector3(0.6f, 0, 0), "Height");
         }
-        else // Cuboid
+        else 
         {
-            // FIX: Y is now -0.5f so it starts perfectly at the bottom!
             Vector3 p = new Vector3(-0.5f, -0.5f, -0.5f); 
             CreateDimension(p, new Vector3(0.5f, -0.5f, -0.5f), new Vector3(0, -0.05f, -0.05f), "Length");
             CreateDimension(p, new Vector3(-0.5f, 0.5f, -0.5f), new Vector3(-0.05f, 0, -0.05f), "Height");
             CreateDimension(p, new Vector3(-0.5f, -0.5f, 0.5f), new Vector3(-0.05f, -0.05f, 0), "Width");
         }
 
-        // 3. Display a generic prompt instead of the hardcoded answer
         CreateVolumeLabel("Solve for Volume!", 0.4f, defaultLabelPos);
     }
 
@@ -414,7 +453,7 @@ public class ARController : MonoBehaviour
         }
         else
         {
-            SceneManager.LoadScene(ExerciseManager.isExerciseMode ? "AR_Exercises" : "AR_Learning"); // Fallback
+            SceneManager.LoadScene(ExerciseManager.isExerciseMode ? "AR_Exercises" : "AR_Learning");
         }
     }
     
@@ -444,7 +483,6 @@ public class ARController : MonoBehaviour
         }
     }
 
-    // Call this from your UI Buttons to change the color
     public void SetShapeColor(string colorName)
     {
         string cleanedColor = colorName.ToLower().Trim();
@@ -456,7 +494,6 @@ public class ARController : MonoBehaviour
         else if (cleanedColor == "yellow") 
             currentSelectedColor = Color.yellow;
 
-        // If an object is already sitting on the table, repaint it instantly
         if (spawnedObject != null)
         {
             ApplyColorToMesh();
@@ -468,25 +505,17 @@ public class ARController : MonoBehaviour
         Renderer[] renderers = spawnedObject.GetComponentsInChildren<Renderer>();
         foreach (Renderer r in renderers)
         {
-            // Ensure we do not overwrite the yellow measurement/dimension layout lines!
             if (!(r is LineRenderer)) 
             {
-                // Accessing '.material' instantiates a unique runtime copy automatically.
-                // We use "_BaseColor" to guarantee compatibility with URP Lit shaders.
-                r.material.SetColor("_BaseColor", currentSelectedColor);
-            }
-        }
-    }
-
-    private void ChangeSpawnedColor(Material targetMat)
-    {
-        if (targetMat == null) return;
-        Renderer[] renderers = spawnedObject.GetComponentsInChildren<Renderer>();
-        foreach (Renderer r in renderers)
-        {
-            if (!(r is LineRenderer)) // Keep yellow layout lines intact
-            {
-                r.material = targetMat;
+                // Bulletproof Color logic that checks for URP vs Standard materials!
+                if (r.material.HasProperty("_BaseColor"))
+                {
+                    r.material.SetColor("_BaseColor", currentSelectedColor);
+                }
+                else
+                {
+                    r.material.color = currentSelectedColor; 
+                }
             }
         }
     }

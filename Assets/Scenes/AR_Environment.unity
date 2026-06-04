@@ -1145,7 +1145,7 @@ MonoBehaviour:
   onAnimationComplete:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1620554178}
+      - m_Target: {fileID: 1368288485}
         m_TargetAssemblyTypeName: ARController, Assembly-CSharp
         m_MethodName: SetShapeColor
         m_Mode: 5
@@ -5479,9 +5479,6 @@ MonoBehaviour:
   planeManager: {fileID: 1368288487}
   dimensionPrefab: {fileID: 3181848045023271859, guid: 925d1f9d85329488d8784c9f89612cc4, type: 3}
   volumeLabelPrefab: {fileID: 2465471791846284574, guid: cc68bf007f92c429daf1ff543eafd56d, type: 3}
-  matRed: {fileID: 0}
-  matGreen: {fileID: 0}
-  matYellow: {fileID: 0}
 --- !u!114 &1368288486
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6915,7 +6912,7 @@ MonoBehaviour:
   onAnimationComplete:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1620554178}
+      - m_Target: {fileID: 1368288485}
         m_TargetAssemblyTypeName: ARController, Assembly-CSharp
         m_MethodName: SetShapeColor
         m_Mode: 5
@@ -7253,7 +7250,6 @@ GameObject:
   - component: {fileID: 1620554174}
   - component: {fileID: 1620554173}
   - component: {fileID: 1620554177}
-  - component: {fileID: 1620554178}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -7385,33 +7381,6 @@ MonoBehaviour:
   - {fileID: 424170028}
   colorFlyoutMenu: {fileID: 1883429509}
   currentUnit: m
---- !u!114 &1620554178
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1620554172}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5cae18ab5d0eb45508ac23b0622d9531, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ARController
-  cuboidPrefab: {fileID: 0}
-  triangularPrismPrefab: {fileID: 0}
-  pyramidPrefab: {fileID: 0}
-  conePrefab: {fileID: 0}
-  cylinderPrefab: {fileID: 0}
-  spherePrefab: {fileID: 0}
-  uiManager: {fileID: 0}
-  promptText: {fileID: 0}
-  raycastManager: {fileID: 0}
-  planeManager: {fileID: 0}
-  dimensionPrefab: {fileID: 0}
-  volumeLabelPrefab: {fileID: 0}
-  matRed: {fileID: 0}
-  matGreen: {fileID: 0}
-  matYellow: {fileID: 0}
 --- !u!1 &1633278881
 GameObject:
   m_ObjectHideFlags: 0
@@ -9135,7 +9104,7 @@ MonoBehaviour:
   onAnimationComplete:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1620554178}
+      - m_Target: {fileID: 1368288485}
         m_TargetAssemblyTypeName: ARController, Assembly-CSharp
         m_MethodName: SetShapeColor
         m_Mode: 5
