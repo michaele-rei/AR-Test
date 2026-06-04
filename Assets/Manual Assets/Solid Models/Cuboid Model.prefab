@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 2623807822342264485}
   - component: {fileID: 6007200863686198471}
   m_Layer: 0
-  m_Name: Rectangular Prism Model
+  m_Name: Cuboid Model
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

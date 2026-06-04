@@ -1,11 +1,15 @@
 using UnityEngine;
 using UnityEngine.SceneManagement; 
+using DG.Tweening; 
 
 public class ButtonScript : MonoBehaviour
 {
     [Header("Textbook Pages (Only needed in Textbook Scene)")]
     public GameObject pageCube;
     public GameObject pageSphere;
+
+    [Header("Audio")]
+    public AudioSource menuMusic;
 
     // --- SHARED MEMORY ---
     public static string selectedShape = "Cube"; 
@@ -14,6 +18,9 @@ public class ButtonScript : MonoBehaviour
     public void StartGame()
     {
         // Use this button on the Main Menu to go to the Textbook
+
+        if (menuMusic != null) menuMusic.DOFade(0f, 0.4f);
+
         if (SceneFader.Instance != null)
         {
             SceneFader.Instance.LoadSceneSmoothly("AR_Learning"); 
@@ -68,6 +75,12 @@ public class ButtonScript : MonoBehaviour
     // --- AR FUNCTIONS ---
     public void LaunchAR()
     {
+        // FIX: Added SetLink so it safely cancels if the scene loads mid-fade!
+        if (menuMusic != null) 
+        {
+            menuMusic.DOFade(0f, 0.4f).SetLink(menuMusic.gameObject);
+        }
+
         if (SceneFader.Instance != null)
         {
             SceneFader.Instance.LoadSceneSmoothly("AR_Environment"); 
@@ -80,6 +93,12 @@ public class ButtonScript : MonoBehaviour
 
     public void LaunchExercise()
     {
+        // FIX: Added SetLink so it safely cancels if the scene loads mid-fade!
+        if (menuMusic != null) 
+        {
+            menuMusic.DOFade(0f, 0.4f).SetLink(menuMusic.gameObject);
+        }
+        
         if (SceneFader.Instance != null)
         {
             SceneFader.Instance.LoadSceneSmoothly("AR_Exercises"); 

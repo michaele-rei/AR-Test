@@ -579,8 +579,8 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1435852308}
-  - {fileID: 1616145087}
   - {fileID: 332822020}
+  - {fileID: 1616145087}
   - {fileID: 1097518923}
   - {fileID: 563549974}
   - {fileID: 2021198517}
@@ -680,6 +680,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ButtonScript
   pageCube: {fileID: 1435852307}
   pageSphere: {fileID: 0}
+  menuMusic: {fileID: 0}
 --- !u!114 &149960268
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1634,7 +1635,7 @@ GameObject:
   - component: {fileID: 332822019}
   - component: {fileID: 332822018}
   m_Layer: 5
-  m_Name: 3 Rectangular Prism
+  m_Name: 2 Cuboid
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1713,7 +1714,7 @@ GameObject:
   - component: {fileID: 333451894}
   - component: {fileID: 333451897}
   m_Layer: 5
-  m_Name: Rectangular Prism
+  m_Name: Triangular Prism
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1843,7 +1844,7 @@ MonoBehaviour:
         m_MethodName: ShowPanel
         m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 332822017}
+          m_ObjectArgument: {fileID: 1616145084}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
@@ -2016,14 +2017,14 @@ RectTransform:
   m_GameObject: {fileID: 347641967}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 1.02, y: 1.02, z: 1.02}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 1704432413}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 20, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 500, y: 500}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &347641969
@@ -2046,7 +2047,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 4ebfc90e179b14667afde2e55cb32f58, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 3fccc43a5e60c40f381040484ebe5762, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -3605,11 +3606,11 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 617023535}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 80, y: -59.30005}
-  m_SizeDelta: {x: -79.99997, y: -1827.3007}
-  m_Pivot: {x: 0, y: 1}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -8.7, y: 849.7}
+  m_SizeDelta: {x: 202.7, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &791274040
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3630,9 +3631,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Cube
-
-'
+  m_text: Triangular Prism
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: e07fae35157604d69ab58c2b5ebfeb92, type: 2}
   m_sharedMaterial: {fileID: 2801517507573707056, guid: e07fae35157604d69ab58c2b5ebfeb92, type: 2}
@@ -4508,7 +4507,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Cube
+  m_text: Cuboid
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 4650a095628c744a3b4bab968bd702c4, type: 2}
   m_sharedMaterial: {fileID: 895634511762949769, guid: 4650a095628c744a3b4bab968bd702c4, type: 2}
@@ -4982,7 +4981,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Rectangular Prism
+  m_text: Cuboid
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: e07fae35157604d69ab58c2b5ebfeb92, type: 2}
   m_sharedMaterial: {fileID: 2801517507573707056, guid: e07fae35157604d69ab58c2b5ebfeb92, type: 2}
@@ -5401,8 +5400,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 1.2478638, y: 223.00037}
-  m_SizeDelta: {x: -621.5043, y: -1524.6008}
+  m_AnchoredPosition: {x: 1.2478638, y: 202.20053}
+  m_SizeDelta: {x: -621.5043, y: -1566.201}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1130235046
 MonoBehaviour:
@@ -5424,12 +5423,13 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'A cube is a three-dimensional solid object in geometry. A cube has eight
-    vertices and twelve straight edges of the same length, so that these edges form
-    six square faces of the same size.
+  m_text: 'A triangular prism is a prism made up of two triangular bases and three
+    rectangular faces. The two triangular faces are congruent to each other and are
+    called the base of the prism. The three rectangular faces are called the lateral
+    faces.
 
 
-    <b>Formula: <i>V = s<sup>3</sup></i></b>'
+    <b>Formula: <i>V = (1/2)bhl</i></b>'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 4650a095628c744a3b4bab968bd702c4, type: 2}
   m_sharedMaterial: {fileID: 895634511762949769, guid: 4650a095628c744a3b4bab968bd702c4, type: 2}
@@ -5456,8 +5456,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 18
-  m_fontSizeBase: 18
+  m_fontSize: 16
+  m_fontSizeBase: 16
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -7486,8 +7486,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 1.2478638, y: 203.0705}
-  m_SizeDelta: {x: -621.5043, y: -1564.4609}
+  m_AnchoredPosition: {x: 1.2478638, y: 222.10052}
+  m_SizeDelta: {x: -621.5043, y: -1526.401}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1543287933
 MonoBehaviour:
@@ -7509,10 +7509,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "A rectangular prism is a three-dimensional shape, having six faces, where
-    all the faces of the prism are rectangles such that all the pairs of the opposite
-    faces are congruent. A rectangular prism is also known as a cuboid. \n\n<b>Formula:
-    <i>V = lwh </i></b> "
+  m_text: "A cuboid is a 3D box-shaped geometric figure with six flat, rectangular
+    faces and all corners meeting at 90\xB0 right angles. Everyday examples include
+    bricks, shoeboxes, and cereal boxes. A cube is a special type of cuboid where
+    all six faces are squares.\n\n<b>Formula: <i>V = lwh </i></b> "
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 4650a095628c744a3b4bab968bd702c4, type: 2}
   m_sharedMaterial: {fileID: 895634511762949769, guid: 4650a095628c744a3b4bab968bd702c4, type: 2}
@@ -7628,8 +7628,8 @@ Camera:
   m_GameObject: {fileID: 1546630776}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_ClearFlags: 2
+  m_BackGroundColor: {r: 1, g: 1, b: 1, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -7924,7 +7924,7 @@ GameObject:
   - component: {fileID: 1595808450}
   - component: {fileID: 1595808449}
   m_Layer: 5
-  m_Name: Rectangle
+  m_Name: Triangle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8136,7 +8136,7 @@ MonoBehaviour:
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: Cube
+          m_StringArgument: TriangularPrism
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!1 &1616145084
@@ -8151,7 +8151,7 @@ GameObject:
   - component: {fileID: 1616145086}
   - component: {fileID: 1616145085}
   m_Layer: 5
-  m_Name: 2 Cube
+  m_Name: 3 Triangular Prism
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8469,15 +8469,15 @@ RectTransform:
   m_GameObject: {fileID: 1704432412}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 0.9, y: 0.9, z: 0.9}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 347641968}
   m_Father: {fileID: 593262437}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 50, y: 427.04956}
+  m_AnchoredPosition: {x: 50, y: 393.2}
   m_SizeDelta: {x: 600, y: 600}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1704432414
@@ -8530,7 +8530,7 @@ GameObject:
   - component: {fileID: 1712528745}
   - component: {fileID: 1712528744}
   m_Layer: 5
-  m_Name: Cube
+  m_Name: Cuboid
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8933,7 +8933,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: cdf4f09ed521546b7929b71f86d964f4, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 849e5d02acc7d45e39427db3cd234134, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -9361,7 +9361,7 @@ MonoBehaviour:
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: Rectangle
+          m_StringArgument: Cuboid
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!1 &1819727807
@@ -9904,7 +9904,7 @@ GameObject:
   - component: {fileID: 1865769768}
   - component: {fileID: 1865769771}
   m_Layer: 5
-  m_Name: Cube
+  m_Name: Cuboid
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10034,7 +10034,7 @@ MonoBehaviour:
         m_MethodName: ShowPanel
         m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 1616145084}
+          m_ObjectArgument: {fileID: 332822017}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
@@ -11462,7 +11462,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Rectangular Prism
+  m_text: Triangular Prism
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 4650a095628c744a3b4bab968bd702c4, type: 2}
   m_sharedMaterial: {fileID: 895634511762949769, guid: 4650a095628c744a3b4bab968bd702c4, type: 2}

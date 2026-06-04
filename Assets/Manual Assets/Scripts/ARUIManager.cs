@@ -43,12 +43,19 @@ public class ARUIManager : MonoBehaviour
     public Slider row3Slider;
     public TMP_InputField row3Input;
 
+    [Header("Exercise Mode Clean-Up")]
+    public GameObject[] itemsToHideInExerciseMode;
+
+    [Header("Color Drawer System")]
+    public GameObject colorFlyoutMenu;  
+    private RectTransform colorMenuRect;
+    private Vector2 colorMenuOpenPos;
+
     public string currentUnit = "cm";
     private bool isUIVisible = true;
     private bool isSystemUpdating = false;
     private bool isSolidPlaced = false; 
 
-    // NEW: Variables to control the sliding drawer
     private RectTransform unitMenuRect;
     private Vector2 unitMenuOpenPos;
 
@@ -66,7 +73,6 @@ public class ARUIManager : MonoBehaviour
         if (row2Input != null) row2Input.onEndEdit.AddListener(delegate { OnInputEdited(2); });
         if (row3Input != null) row3Input.onEndEdit.AddListener(delegate { OnInputEdited(3); });
 
-        // NEW: Memorize exactly where you placed the menu in the Unity Editor
         if (unitFlyoutMenu != null) 
         {
             unitMenuRect = unitFlyoutMenu.GetComponent<RectTransform>();
@@ -75,6 +81,21 @@ public class ARUIManager : MonoBehaviour
         }
 
         ResetUI();
+
+        if (ExerciseManager.isExerciseMode)
+        {
+            foreach (GameObject item in itemsToHideInExerciseMode)
+            {
+                if (item != null) item.SetActive(false);
+            }
+        }
+
+        if (colorFlyoutMenu != null) 
+        {
+            colorMenuRect = colorFlyoutMenu.GetComponent<RectTransform>();
+            colorMenuOpenPos = colorMenuRect.anchoredPosition;
+            colorFlyoutMenu.SetActive(false);
+        }
     }
 
     public void SetupUIForShape(string shapeName)
@@ -92,29 +113,56 @@ public class ARUIManager : MonoBehaviour
 
         isSystemUpdating = true; 
 
+        // Hide all rows initially to clear out layout from previous shapes
+        row1.SetActive(false);
         row2.SetActive(false); 
         row3.SetActive(false);
         if (dashRow2Container != null) dashRow2Container.SetActive(false); 
         if (dashRow3Container != null) dashRow3Container.SetActive(false);
 
-        if (shapeName == "Cube") { row1Label.text = "Side:"; row1.SetActive(true); }
-        else if (shapeName == "Sphere") { row1Label.text = "Radius:"; row1.SetActive(true); }
+        // --- UPDATED: New Shape Configuration Logic ---
+        if (shapeName == "Sphere") 
+        { 
+            row1Label.text = "Radius:"; 
+            row1.SetActive(true); 
+        }
         else if (shapeName == "Cylinder" || shapeName == "Cone")
         {
-            row1Label.text = "Radius:"; row2Label.text = "Height:";
-            row1.SetActive(true); row2.SetActive(true);
+            row1Label.text = "Radius:"; 
+            row2Label.text = "Height:";
+            row1.SetActive(true); 
+            row2.SetActive(true);
             if (dashRow2Container != null) dashRow2Container.SetActive(true);
         }
         else if (shapeName == "Pyramid")
         {
-            row1Label.text = "Base:"; row2Label.text = "Height:";
-            row1.SetActive(true); row2.SetActive(true);
+            row1Label.text = "Base:"; 
+            row2Label.text = "Height:";
+            row1.SetActive(true); 
+            row2.SetActive(true);
             if (dashRow2Container != null) dashRow2Container.SetActive(true);
         }
-        else if (shapeName == "Rectangle")
+        else if (shapeName == "Cuboid")
         {
-            row1Label.text = "Length:"; row2Label.text = "Height:"; row3Label.text = "Width:";
-            row1.SetActive(true); row2.SetActive(true); row3.SetActive(true);
+            // Cuboid requires all 3 tracking sliders
+            row1Label.text = "Length:"; 
+            row2Label.text = "Height:"; 
+            row3Label.text = "Width:";
+            row1.SetActive(true); 
+            row2.SetActive(true); 
+            row3.SetActive(true);
+            if (dashRow2Container != null) dashRow2Container.SetActive(true); 
+            if (dashRow3Container != null) dashRow3Container.SetActive(true);
+        }
+        else if (shapeName == "TriangularPrism")
+        {
+            // Triangular Prism requires all 3 tracking sliders
+            row1Label.text = "Base:"; 
+            row2Label.text = "Height:"; 
+            row3Label.text = "Length:";
+            row1.SetActive(true); 
+            row2.SetActive(true); 
+            row3.SetActive(true);
             if (dashRow2Container != null) dashRow2Container.SetActive(true); 
             if (dashRow3Container != null) dashRow3Container.SetActive(true);
         }
@@ -130,7 +178,7 @@ public class ARUIManager : MonoBehaviour
         if (!row2Input.isFocused) row2Input.text = row2Slider.value.ToString("F2");
         if (!row3Input.isFocused) row3Input.text = row3Slider.value.ToString("F2");
 
-        dashRow1Txt.text = row1Label.text.Replace(":", "") + ": " + row1Slider.value.ToString("F2") + " " + currentUnit;
+        if (row1.activeSelf) dashRow1Txt.text = row1Label.text.Replace(":", "") + ": " + row1Slider.value.ToString("F2") + " " + currentUnit;
         if (row2.activeSelf) dashRow2Txt.text = row2Label.text.Replace(":", "") + ": " + row2Slider.value.ToString("F2") + " " + currentUnit;
         if (row3.activeSelf) dashRow3Txt.text = row3Label.text.Replace(":", "") + ": " + row3Slider.value.ToString("F2") + " " + currentUnit;
 
@@ -216,7 +264,6 @@ public class ARUIManager : MonoBehaviour
         }
     }
 
-    // --- REWRITTEN: DRAWER SLIDE ANIMATION ---
     public void ToggleUnitMenu() 
     { 
         if (!isSolidPlaced || unitFlyoutMenu == null) return; 
@@ -224,34 +271,72 @@ public class ARUIManager : MonoBehaviour
         bool isOpening = !unitFlyoutMenu.activeSelf;
         CanvasGroup cg = GetOrAddCanvasGroup(unitFlyoutMenu);
 
-        // Stop any current sliding if the user taps really fast
         DOTween.Kill(unitMenuRect);
         DOTween.Kill(cg);
 
-        // Adjust this number if the drawer needs to slide further to hide completely!
         float slideDistanceX = 150f; 
 
         if (isOpening)
         {
             unitFlyoutMenu.SetActive(true);
-            
-            // Start the drawer shifted to the right, hidden behind the ruler
             unitMenuRect.anchoredPosition = new Vector2(unitMenuOpenPos.x + slideDistanceX, unitMenuOpenPos.y);
             cg.alpha = 0f;
 
-            // Slide left to its final open position
             unitMenuRect.DOAnchorPos(unitMenuOpenPos, 0.3f).SetEase(Ease.OutBack);
             cg.DOFade(1f, 0.3f);
+
+            if (colorFlyoutMenu != null && colorFlyoutMenu.activeSelf) 
+            {
+                ToggleColorMenu(); 
+            }
         }
         else
         {
-            // Slide right to hide behind the ruler
             Vector2 closedPos = new Vector2(unitMenuOpenPos.x + slideDistanceX, unitMenuOpenPos.y);
             
             unitMenuRect.DOAnchorPos(closedPos, 0.2f).SetEase(Ease.InBack);
             cg.DOFade(0f, 0.2f).OnComplete(() => 
             {
                 unitFlyoutMenu.SetActive(false);
+            });
+        }
+    }
+
+    public void ToggleColorMenu() 
+    { 
+        if (!isSolidPlaced || colorFlyoutMenu == null) return; 
+
+        bool isOpening = !colorFlyoutMenu.activeSelf;
+        CanvasGroup cg = GetOrAddCanvasGroup(colorFlyoutMenu);
+
+        DOTween.Kill(colorMenuRect);
+        DOTween.Kill(cg);
+
+        float slideDistanceX = 150f; // Same distance as the unit drawer
+
+        if (isOpening)
+        {
+            // NEW: If the unit menu is open, close it so they don't overlap!
+            if (unitFlyoutMenu != null && unitFlyoutMenu.activeSelf) 
+            {
+                ToggleUnitMenu(); 
+            }
+
+            colorFlyoutMenu.SetActive(true);
+            colorMenuRect.anchoredPosition = new Vector2(colorMenuOpenPos.x + slideDistanceX, colorMenuOpenPos.y);
+            cg.alpha = 0f;
+
+            colorMenuRect.DOAnchorPos(colorMenuOpenPos, 0.3f).SetEase(Ease.OutBack);
+            cg.DOFade(1f, 0.3f);
+        }
+        else
+        {
+            Vector2 closedPos = new Vector2(colorMenuOpenPos.x + slideDistanceX, colorMenuOpenPos.y);
+            
+            colorMenuRect.DOAnchorPos(closedPos, 0.2f).SetEase(Ease.InBack);
+            cg.DOFade(0f, 0.2f).OnComplete(() => 
+            {
+                colorFlyoutMenu.SetActive(false);
             });
         }
     }
@@ -288,19 +373,13 @@ public class ARUIManager : MonoBehaviour
         isSystemUpdating = false;
         OnSliderMoved(); 
         AnimateUnitTexts();
-        
     }
 
-    // NEW: The Scale Punch animation for unit changes
     private void AnimateUnitTexts()
     {
-        float punchAmount = 0.2f; // Makes the text grow by 20%
-        float duration = 0.3f;    // Snaps back in 0.3 seconds
+        float punchAmount = 0.2f; 
+        float duration = 0.3f;   
 
-        // DOKill(true) forces the text back to normal size instantly if the user spams the button, 
-        // preventing the text from permanently growing out of control!
-        
-        // 1. Pop the top dashboard texts
         dashRow1Txt.transform.DOKill(true);
         dashRow1Txt.transform.DOPunchScale(Vector3.one * punchAmount, duration, 5, 1);
         
@@ -318,7 +397,6 @@ public class ARUIManager : MonoBehaviour
             dashRow3Txt.transform.DOPunchScale(Vector3.one * punchAmount, duration, 5, 1);
         }
 
-        // 2. Pop the input boxes on the bottom sliders
         if (row1.activeSelf && row1Input != null) 
         {
             row1Input.transform.DOKill(true);
