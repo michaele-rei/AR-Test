@@ -54,6 +54,23 @@ public class ButtonScript : MonoBehaviour
 
     // --- AR FUNCTIONS ---
     // --- AR FUNCTIONS ---
+    // Call this from your UI Mute Button!
+    public void MuteMusic()
+    {
+        // 1. Search the entire game for the surviving Audio Manager
+        GlobalAudioManager audioManager = FindObjectOfType<GlobalAudioManager>();
+
+        // 2. If we found it, tell it to mute!
+        if (audioManager != null)
+        {
+            // Note: Replace "ToggleMute" with whatever your actual mute function is called!
+            audioManager.ToggleMute(); 
+        }
+        else
+        {
+            Debug.LogWarning("Could not find the GlobalAudioManager in the scene!");
+        }
+    }
     public void LaunchAR()
     {
         // FIX: Added SetLink so it safely cancels if the scene loads mid-fade!

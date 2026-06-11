@@ -672,6 +672,7 @@ GameObject:
   - component: {fileID: 506045315}
   - component: {fileID: 506045314}
   - component: {fileID: 506045313}
+  - component: {fileID: 506045316}
   m_Layer: 5
   m_Name: GlobalAudioManager
   m_TagString: Untagged
@@ -807,6 +808,234 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &506045316
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 506045312}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd7591d672d2a48eaaefb23c07e0b775, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ExercisesDatabase
+  currentExerciseIndex: 0
+  allExercises:
+  - exerciseName: Wood Block
+    questionType: 0
+    shapeType: Cuboid
+    dimensionX: 2
+    dimensionY: 5
+    dimensionZ: 3
+    unitType: in
+    problemText: A wooden block has a length of 2 in, width of 3 in, and height of
+      5 in. Find the volume.
+    hintText: "Remember the formula for a rectangular prism is V = l \xD7 w \xD7
+      h. Try multiplying all three numbers together!"
+    solutionText: "Volume = Length \xD7 Width \xD7 Height\nV = 2 \xD7 3 \xD7 5\nV
+      = 30 in\xB3"
+    correctVolume: 30
+    correctShapeName: 
+  - exerciseName: Soda Can
+    questionType: 0
+    shapeType: Cylinder
+    dimensionX: 5
+    dimensionY: 8
+    dimensionZ: 0
+    unitType: cm
+    problemText: A cylinder has a radius of 5 cm and height of 8 cm. Find the volume.
+    hintText: "The volume of a cylinder is V = \u03C0r\xB2h. Make sure you square
+      the radius first, then multiply by the height and Pi!"
+    solutionText: "Volume = \u03C0 \xD7 r\xB2 \xD7 h\nV = 3.14159 \xD7 5\xB2 \xD7
+      8\nV \u2248 628.32 cm\xB3"
+    correctVolume: 628.32
+    correctShapeName: 
+  - exerciseName: Basketball
+    questionType: 0
+    shapeType: Sphere
+    dimensionX: 6
+    dimensionY: 0
+    dimensionZ: 0
+    unitType: in
+    problemText: "Find the radius: C = 12\u03C0. Once you have the radius, find the
+      volume of the sphere."
+    hintText: "First, use the circumference to find the radius (C = 2\u03C0r). Once
+      you have the radius, plug it into the sphere volume formula: V = (4/3)\u03C0r\xB3."
+    solutionText: "First, find the radius: 12\u03C0 = 2\u03C0r, so r = 6. Volume
+      = (4/3) \xD7 \u03C0 \xD7 r\xB3. V = (4/3) \xD7 3.14159 \xD7 216. V \u2248 904.78
+      in\xB3."
+    correctVolume: 904.78
+    correctShapeName: 
+  - exerciseName: Toilet Roll
+    questionType: 1
+    shapeType: Cylinder
+    dimensionX: 5
+    dimensionY: 10
+    dimensionZ: 0
+    unitType: cm
+    problemText: A toilet roll has a circular top and bottom connected by a curved
+      surface. What shape is this?
+    hintText: Think about a shape with two circles on the ends and a tube in the
+      middle.
+    solutionText: A toilet roll has a circular top and bottom connected by a curved
+      surface, making it a cylinder.
+    correctVolume: 0
+    correctShapeName: cylinder
+  - exerciseName: Rubik's Cube
+    questionType: 1
+    shapeType: Cuboid
+    dimensionX: 5
+    dimensionY: 5
+    dimensionZ: 5
+    unitType: cm
+    problemText: A Rubik's cube has 6 equal square faces. What is this shape?
+    hintText: The name of the object gives it away! It is a box where every single
+      side is exactly the same length.
+    solutionText: A Rubik's cube has 6 equal square faces, which defines a cube.
+    correctVolume: 0
+    correctShapeName: cube
+  - exerciseName: Golf Ball
+    questionType: 1
+    shapeType: Sphere
+    dimensionX: 2
+    dimensionY: 0
+    dimensionZ: 0
+    unitType: in
+    problemText: A golf ball is perfectly round like a globe. What shape is this?
+    hintText: What do we call a perfectly round 3D circle?
+    solutionText: A golf ball is perfectly round like a globe, making it a sphere.
+    correctVolume: 0
+    correctShapeName: sphere
+  - exerciseName: Pharaoh Souvenir
+    questionType: 1
+    shapeType: Pyramid
+    dimensionX: 4
+    dimensionY: 4
+    dimensionZ: 4
+    unitType: in
+    problemText: This souvenir model of an ancient Egyptian resting place has a square
+      base. What shape is this?
+    hintText: Think about the Great Sphinx. What giant structures are right behind
+      it?
+    solutionText: The ancient Egyptian resting places are famous square-based pyramids.
+    correctVolume: 0
+    correctShapeName: pyramid
+  - exerciseName: iPhone Box
+    questionType: 1
+    shapeType: Cuboid
+    dimensionX: 3
+    dimensionY: 1
+    dimensionZ: 6
+    unitType: in
+    problemText: An iPhone box has 6 rectangular faces. What shape is this?
+    hintText: It's a box with rectangles for its faces. What do we call a 3D rectangle?
+    solutionText: An iPhone box has 6 rectangular faces, making it a rectangular
+      prism.
+    correctVolume: 0
+    correctShapeName: rectangular prism
+  - exerciseName: Toblerone
+    questionType: 1
+    shapeType: TriangularPrism
+    dimensionX: 3
+    dimensionY: 3
+    dimensionZ: 15
+    unitType: cm
+    problemText: A Toblerone has triangular ends connected by rectangular sides.
+      What shape is this?
+    hintText: "Look at the ends of the chocolate bar\u2014they are triangles! What
+      kind of prism has a triangle base?"
+    solutionText: A Toblerone has triangular ends connected by rectangular sides,
+      forming a triangular prism.
+    correctVolume: 0
+    correctShapeName: triangular prism
+  - exerciseName: Traffic Cone
+    questionType: 1
+    shapeType: Cone
+    dimensionX: 5
+    dimensionY: 12
+    dimensionZ: 0
+    unitType: 
+    problemText: A traffic cone has a circular base that tapers to a single point.
+      What shape is this?
+    hintText: The name is in the item! It has a circle at the bottom and a sharp
+      point at the top.
+    solutionText: A traffic cone has a circular base that tapers to a single point,
+      which is the definition of a cone.
+    correctVolume: 0
+    correctShapeName: cone
+  - exerciseName: Paperweight
+    questionType: 0
+    shapeType: Pyramid
+    dimensionX: 2
+    dimensionY: 3
+    dimensionZ: 2
+    unitType: in
+    problemText: This glass paperweight is a square pyramid. Its base is 2x2 in and
+      it stands 3 in tall. Find the volume.
+    hintText: "The base is a square, so find its area first (side \xD7 side). Then
+      multiply that area by the height, and divide by 3!"
+    solutionText: "Volume = (1/3) \xD7 Base Area \xD7 Height. \nBase Area = 2 \xD7
+      2 = 4. \nV = (1/3) \xD7 4 \xD7 3. V = 4 in\xB3."
+    correctVolume: 0
+    correctShapeName: 4
+  - exerciseName: Toy Tent
+    questionType: 0
+    shapeType: TriangularPrism
+    dimensionX: 6
+    dimensionY: 7
+    dimensionZ: 10
+    unitType: in
+    problemText: A toy camping tent is a triangular prism. The front triangle has
+      a base of 6 in and height of 7 in. The tent is 10 in long. Find the volume.
+    hintText: "Find the area of the triangle base first (0.5 \xD7 base \xD7 height).
+      Then multiply by the length!"
+    solutionText: "Base Area = 0.5 \xD7 6 \xD7 7 = 21. \nVolume = Base Area \xD7
+      Length. \nV = 21 \xD7 10 = 210 in\xB3."
+    correctVolume: 210
+    correctShapeName: 
+  - exerciseName: Party Hat
+    questionType: 0
+    shapeType: Cone
+    dimensionX: 5
+    dimensionY: 10
+    dimensionZ: 0
+    unitType: in
+    problemText: A party hat (cone) has a radius of 5 in and a height of 10 in. Find
+      the volume.
+    hintText: "The volume of a cone is V = (1/3)\u03C0r\xB2h. Square the radius first!"
+    solutionText: "Volume = (1/3) \xD7 \u03C0 \xD7 r\xB2 \xD7 h. \nV = (1/3) \xD7
+      3.14159 \xD7 25 \xD7 10. \nV \u2248 261.8 in\xB3."
+    correctVolume: 261.8
+    correctShapeName: 
+  - exerciseName: Pencil Box
+    questionType: 0
+    shapeType: Cuboid
+    dimensionX: 10
+    dimensionY: 8
+    dimensionZ: 5
+    unitType: cm
+    problemText: A pencil box is 10 cm long, 5 cm wide, and 8 cm tall. Find the volume.
+    hintText: A cuboid is just another name for a rectangular prism. Just multiply
+      the length, width, and height together!
+    solutionText: "Volume = length \xD7 width \xD7 height. \nV = 10 \xD7 5 \xD7 8.
+      \nV = 400 cm\xB3."
+    correctVolume: 400
+    correctShapeName: 
+  - exerciseName: Paint Bucket
+    questionType: 0
+    shapeType: Cylinder
+    dimensionX: 10
+    dimensionY: 8
+    dimensionZ: 0
+    unitType: in
+    problemText: Assuming the radius is 10 in and the height is 8 in, find the volume
+      of this bucket.
+    hintText: "Use the formula V = \u03C0r\xB2h. Square the radius first!"
+    solutionText: "Volume = \u03C0 \xD7 r\xB2 \xD7 h. \nV = 3.14159 \xD7 10\xB2 \xD7
+      8. \nV \u2248 2513.27 in\xB3."
+    correctVolume: 2513.27
+    correctShapeName: 
 --- !u!1 &508865806
 GameObject:
   m_ObjectHideFlags: 0
@@ -991,9 +1220,9 @@ MonoBehaviour:
   onAnimationComplete:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 506045313}
-        m_TargetAssemblyTypeName: GlobalAudioManager, Assembly-CSharp
-        m_MethodName: ToggleMute
+      - m_Target: {fileID: 149960267}
+        m_TargetAssemblyTypeName: ButtonScript, Assembly-CSharp
+        m_MethodName: MuteMusic
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

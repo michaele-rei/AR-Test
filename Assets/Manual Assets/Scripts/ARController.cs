@@ -45,13 +45,46 @@ public class ARController : MonoBehaviour
 
     void Start()
     {
-        // Forces AR Foundation to completely reset the camera/simulator pipe on load!
-        if (LoaderUtility.GetActiveLoader() != null) { LoaderUtility.GetActiveLoader().Initialize(); }
+        // ==========================================
+        // THE FRESH START PROTOCOL
+        // ==========================================
+        // 1. Force the physical AR hardware to wipe its memory and reboot
+        ARSession arSession = FindObjectOfType<ARSession>();
+        if (arSession != null) 
+        {
+            arSession.Reset();
+        }
 
-        selectedShape = string.IsNullOrEmpty(ButtonScript.selectedShape) ? "Cube" : ButtonScript.selectedShape;
+        // 2. Wipe all script memory from the previous session
+        isPlaced = false;
+        isShowcasing = false;
+        hasSeenShowcase = false;
+        ClearOldLabels();
+        if (spawnedObject != null) 
+        {
+            Destroy(spawnedObject);
+            spawnedObject = null;
+        }
 
-        if (ExerciseManager.isExerciseMode) {
+        // 3. Reset the Camera Simulator pipeline (Your existing code)
+        if (LoaderUtility.GetActiveLoader() != null) 
+        { 
+            LoaderUtility.GetActiveLoader().Initialize(); 
+        }
+
+        // ==========================================
+        // EXERCISE SETUP
+        // ==========================================
+        if (ExerciseManager.isExerciseMode && ExercisesDatabase.Instance != null)
+        {
+            ExerciseData currentEx = ExercisesDatabase.Instance.GetCurrentExercise();
+            if (currentEx != null) selectedShape = currentEx.shapeType;
+            
             if (promptText != null) promptText.GetComponent<TextMeshProUGUI>().text = "Touch & Hold to place";
+        }
+        else
+        {
+            selectedShape = string.IsNullOrEmpty(ButtonScript.selectedShape) ? "Cube" : ButtonScript.selectedShape;
         }
     }
 
@@ -115,18 +148,48 @@ public class ARController : MonoBehaviour
     void BillboardLabels()
     {
         if (spawnedObject == null) return;
+        
+        // 1. Calculate the rotation to face the camera
         Vector3 dirToCamera = Camera.main.transform.position - spawnedObject.transform.position;
         dirToCamera.y = 0;
         Quaternion textRotation = Quaternion.LookRotation(dirToCamera);
         textRotation *= Quaternion.Euler(0, 180, 0);
 
-        if (volumeLabelObj != null) volumeLabelObj.transform.rotation = textRotation;
+        // ==========================================
+        // THE ANTI-STRETCH MATH
+        // ==========================================
+        // 2. Find exactly how distorted the parent shape is right now
+        Vector3 parentScale = spawnedObject.transform.localScale;
+        
+        // Prevent divide-by-zero errors if the shape scales to 0
+        float safeX = Mathf.Max(Mathf.Abs(parentScale.x), 0.001f);
+        float safeY = Mathf.Max(Mathf.Abs(parentScale.y), 0.001f);
+        float safeZ = Mathf.Max(Mathf.Abs(parentScale.z), 0.001f);
+        
+        // 3. Define the absolute world size of your text (Adjust if too big/small)
+        float textWorldSize = 0.035f; 
+        
+        // 4. Create the exact mathematical inverse scale
+        Vector3 counterScale = new Vector3(textWorldSize / safeX, textWorldSize / safeY, textWorldSize / safeZ);
+
+        // 5. Apply the rotation and counter-scale to the main Volume Label
+        if (volumeLabelObj != null) 
+        {
+            volumeLabelObj.transform.rotation = textRotation;
+            volumeLabelObj.transform.localScale = counterScale;
+        }
+
+        // 6. Apply the rotation and counter-scale to all Dimension lines
         foreach (var dim in activeDimensions)
         {
             if (dim != null)
             {
                 TextMeshPro label = dim.GetComponentInChildren<TextMeshPro>();
-                if (label != null) label.transform.rotation = textRotation;
+                if (label != null) 
+                {
+                    label.transform.rotation = textRotation;
+                    label.transform.localScale = counterScale; // Force the text to stop stretching!
+                }
             }
         }
     }
@@ -388,46 +451,78 @@ public class ARController : MonoBehaviour
         ClearOldLabels();
         Vector3 defaultLabelPos = new Vector3(0, 0.7f, 0);
 
-        spawnedObject.transform.localScale = new Vector3(0.4f, 0.4f, 0.4f);
+        // 1. Fetch current question from our database
+        if (ExercisesDatabase.Instance == null)
+        {
+            Debug.LogError("ExercisesDatabase Instance is missing in scene!");
+            return;
+        }
+        ExerciseData currentEx = ExercisesDatabase.Instance.GetCurrentExercise();
+        if (currentEx == null) return;
 
-        if (selectedShape == "Sphere")
+        // 2. Convert desktop real-world measurements to Unity world meters for a perfect 1:1 scale
+        float conversionFactor = 1f; // Default for meters "m"
+        if (currentEx.unitType == "cm") conversionFactor = 0.01f;
+        else if (currentEx.unitType == "in") conversionFactor = 0.0254f;
+
+        float x = currentEx.dimensionX * conversionFactor;
+        float y = currentEx.dimensionY * conversionFactor;
+        float z = currentEx.dimensionZ * conversionFactor;
+        string u = currentEx.unitType;
+
+        // 3. Apply the exact 1:1 physical dimensions to your prefabs based on their structural math
+        if (selectedShape == "Cuboid")
         {
-            CreateDimension(Vector3.zero, new Vector3(0.5f, 0, 0), new Vector3(0, 0.55f, 0), "Radius");
-        }
-        else if (selectedShape == "Cylinder")
-        {
-            spawnedObject.transform.localScale = new Vector3(0.4f, 0.2f, 0.4f); 
-            CreateDimension(new Vector3(0, 1f, 0), new Vector3(0.5f, 1f, 0), new Vector3(0, 0.1f, 0), "Radius");
-            CreateDimension(new Vector3(-0.5f, -1f, 0), new Vector3(-0.5f, 1f, 0), new Vector3(-0.1f, 0, 0), "Height");
-        }
-        else if (selectedShape == "Cone")
-        {
-            CreateDimension(new Vector3(0, 0.5f, 0), new Vector3(0.5f, 0.5f, 0), new Vector3(0, 0.05f, 0), "Radius");
-            CreateDimension(new Vector3(0, -0.5f, 0), new Vector3(0, 0.5f, 0), new Vector3(0.6f, 0, 0), "Height");
+            spawnedObject.transform.localScale = new Vector3(x, y, z);
+            Vector3 p = new Vector3(-0.5f, -0.5f, -0.5f);
+            CreateDimension(p, new Vector3(0.5f, -0.5f, -0.5f), new Vector3(0, -0.05f, -0.05f), $"L = {currentEx.dimensionX} {u}");
+            CreateDimension(p, new Vector3(-0.5f, 0.5f, -0.5f), new Vector3(-0.05f, 0, -0.05f), $"H = {currentEx.dimensionY} {u}");
+            CreateDimension(p, new Vector3(-0.5f, -0.5f, 0.5f), new Vector3(-0.05f, -0.05f, 0), $"W = {currentEx.dimensionZ} {u}");
         }
         else if (selectedShape == "TriangularPrism")
         {
+            spawnedObject.transform.localScale = new Vector3(x, y, z);
             Vector3 p = new Vector3(-0.5f, -0.5f, -0.5f);
-            CreateDimension(p, new Vector3(0.5f, -0.5f, -0.5f), new Vector3(0, -0.05f, -0.05f), "Base");
-            CreateDimension(p, new Vector3(-0.5f, 0.5f, -0.5f), new Vector3(-0.05f, 0, 0), "Height");
-            CreateDimension(p, new Vector3(-0.5f, -0.5f, 0.5f), new Vector3(-0.05f, -0.05f, 0), "Length");
+            CreateDimension(p, new Vector3(0.5f, -0.5f, -0.5f), new Vector3(0, -0.05f, -0.05f), $"b = {currentEx.dimensionX} {u}");
+            CreateDimension(p, new Vector3(-0.5f, 0.5f, -0.5f), new Vector3(-0.05f, 0, 0), $"h = {currentEx.dimensionY} {u}");
+            CreateDimension(p, new Vector3(-0.5f, -0.5f, 0.5f), new Vector3(-0.05f, -0.05f, 0), $"L = {currentEx.dimensionZ} {u}");
+        }
+        else if (selectedShape == "Sphere")
+        {
+            spawnedObject.transform.localScale = Vector3.one * x;
+            // Display radius on the dimension tracker label
+            CreateDimension(Vector3.zero, new Vector3(0.5f, 0, 0), new Vector3(0, 0.55f, 0), $"r = {(currentEx.dimensionX / 2f):F2} {u}");
+        }   
+        else if (selectedShape == "Cylinder")
+        {
+            spawnedObject.transform.localScale = new Vector3(x, y / 2f, x);
+            CreateDimension(new Vector3(0, 1f, 0), new Vector3(0.5f, 1f, 0), new Vector3(0, 0.1f, 0), $"r = {currentEx.dimensionX} {u}");
+            CreateDimension(new Vector3(-0.5f, -1f, 0), new Vector3(-0.5f, 1f, 0), new Vector3(-0.1f, 0, 0), $"h = {currentEx.dimensionY} {u}");
+        }
+        else if (selectedShape == "Cone")
+        {
+            spawnedObject.transform.localScale = new Vector3(x, y, x);
+            CreateDimension(new Vector3(0, 0.5f, 0), new Vector3(0.5f, 0.5f, 0), new Vector3(0, 0.05f, 0), $"r = {currentEx.dimensionX} {u}");
+            CreateDimension(new Vector3(0, -0.5f, 0), new Vector3(0, 0.5f, 0), new Vector3(0.6f, 0, 0), $"h = {currentEx.dimensionY} {u}");
         }
         else if (selectedShape == "Pyramid")
         {
+            spawnedObject.transform.localScale = new Vector3(x, y, x);
             Vector3 p = new Vector3(-0.5f, -0.5f, -0.5f); 
-            CreateDimension(p, new Vector3(0.5f, -0.5f, -0.5f), new Vector3(0, -0.05f, -0.05f), "Base"); 
-            CreateDimension(p, new Vector3(-0.5f, -0.5f, 0.5f), new Vector3(-0.05f, -0.05f, 0), "Base"); 
-            CreateDimension(new Vector3(0, -0.5f, 0), new Vector3(0, 0.5f, 0), new Vector3(0.6f, 0, 0), "Height");
-        }
-        else 
-        {
-            Vector3 p = new Vector3(-0.5f, -0.5f, -0.5f); 
-            CreateDimension(p, new Vector3(0.5f, -0.5f, -0.5f), new Vector3(0, -0.05f, -0.05f), "Length");
-            CreateDimension(p, new Vector3(-0.5f, 0.5f, -0.5f), new Vector3(-0.05f, 0, -0.05f), "Height");
-            CreateDimension(p, new Vector3(-0.5f, -0.5f, 0.5f), new Vector3(-0.05f, -0.05f, 0), "Width");
+            CreateDimension(p, new Vector3(0.5f, -0.5f, -0.5f), new Vector3(0, -0.05f, -0.05f), $"b = {currentEx.dimensionX} {u}"); 
+            CreateDimension(p, new Vector3(-0.5f, -0.5f, 0.5f), new Vector3(-0.05f, -0.05f, 0), $"b = {currentEx.dimensionX} {u}"); 
+            CreateDimension(new Vector3(0, -0.5f, 0), new Vector3(0, 0.5f, 0), new Vector3(0.6f, 0, 0), $"h = {currentEx.dimensionY} {u}");
         }
 
-        CreateVolumeLabel("Solve for Volume!", 0.4f, defaultLabelPos);
+        // 4. Update the text overlays via your UI managers or floating labels
+        if (promptText != null)
+        {
+            promptText.SetActive(false);
+            promptText.GetComponent<TextMeshProUGUI>().text = currentEx.problemText;
+        }
+
+        CreateVolumeLabel("Solve the Problem!", Mathf.Max(x, Mathf.Max(y, z)), defaultLabelPos);
+        BillboardLabels();
     }
 
     void CreateDimension(Vector3 start, Vector3 end, Vector3 offset, string text)

@@ -3368,7 +3368,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 20.2}
+  m_AnchoredPosition: {x: 0, y: 20.199951}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &258801539
@@ -5092,14 +5092,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4acb820b7ca1b4e8db587523b76d8756, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ExerciseCard
+  databaseIndex: 5
   answerInput: {fileID: 1162516673}
   checkButton: {fileID: 1226401801}
   viewInARButton: {fileID: 208013207}
   checkButtonImage: {fileID: 1226401802}
-  correctAnswer: sphere
-  solutionText: A golf ball is perfectly round like a globe, making it a sphere.
-  hintText: What do we call a perfectly round 3D circle?
-  arShapeName: Sphere
 --- !u!1 &375671177
 GameObject:
   m_ObjectHideFlags: 0
@@ -5149,15 +5146,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4acb820b7ca1b4e8db587523b76d8756, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ExerciseCard
+  databaseIndex: 3
   answerInput: {fileID: 730243992}
   checkButton: {fileID: 747422238}
   viewInARButton: {fileID: 165522927}
   checkButtonImage: {fileID: 747422239}
-  correctAnswer: cylinder
-  solutionText: A toilet roll has a circular top and bottom connected by a curved
-    surface, making it a cylinder.
-  hintText: Think about a shape with two circles on the ends and a tube in the middle.
-  arShapeName: Cylinder
 --- !u!1 &395581260
 GameObject:
   m_ObjectHideFlags: 0
@@ -6050,17 +6043,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4acb820b7ca1b4e8db587523b76d8756, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ExerciseCard
+  databaseIndex: 2
   answerInput: {fileID: 1672383615}
   checkButton: {fileID: 1381041928}
   viewInARButton: {fileID: 471739132}
   checkButtonImage: {fileID: 1381041929}
-  correctAnswer: 904.78
-  solutionText: "First, find the radius: C = 2\u03C0r, so 12\u03C0 = 2\u03C0r. Therefore,
-    r = 6.\nVolume = (4/3) \xD7 \u03C0 \xD7 r\xB3\nV = (4/3) \xD7 3.14159 \xD7 6\xB3\nV
-    = (4/3) \xD7 3.14159 \xD7 216\nV \u2248 904.78 in\xB3"
-  hintText: "First, use the circumference (12\u03C0) to find the radius (C = 2\u03C0r).
-    Once you have the radius, plug it into the sphere volume formula: V = (4/3)\u03C0r\xB3."
-  arShapeName: Sphere
 --- !u!1 &471739129
 GameObject:
   m_ObjectHideFlags: 0
@@ -10518,16 +10505,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4acb820b7ca1b4e8db587523b76d8756, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ExerciseCard
+  databaseIndex: 14
   answerInput: {fileID: 1423392105}
   checkButton: {fileID: 4103154}
   viewInARButton: {fileID: 643668500}
   checkButtonImage: {fileID: 4103155}
-  correctAnswer: 2513.27
-  solutionText: "Volume = \u03C0 \xD7 r\xB2 \xD7 h\nV = 3.14159 \xD7 10\xB2 \xD7
-    8\nV = 3.14159 \xD7 100 \xD7 8\nV \u2248 2513.27 in\xB3"
-  hintText: "Assuming the radius is 10 inches, plug the values into the formula V
-    = \u03C0r\xB2h. Square the radius first!"
-  arShapeName: Cylinder
 --- !u!1 &756523268
 GameObject:
   m_ObjectHideFlags: 0
@@ -10613,16 +10595,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4acb820b7ca1b4e8db587523b76d8756, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ExerciseCard
+  databaseIndex: 9
   answerInput: {fileID: 412285419}
   checkButton: {fileID: 395581263}
   viewInARButton: {fileID: 1938824549}
   checkButtonImage: {fileID: 395581264}
-  correctAnswer: cone
-  solutionText: A traffic cone has a circular base that tapers to a single point,
-    which is the definition of a cone.
-  hintText: The name is in the item! It has a circle at the bottom and a sharp point
-    at the top.
-  arShapeName: Cone
 --- !u!1 &783883525
 GameObject:
   m_ObjectHideFlags: 0
@@ -10889,14 +10866,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4acb820b7ca1b4e8db587523b76d8756, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ExerciseCard
+  databaseIndex: 7
   answerInput: {fileID: 1160009874}
   checkButton: {fileID: 51683262}
   viewInARButton: {fileID: 828706651}
   checkButtonImage: {fileID: 51683263}
-  correctAnswer: rectangular prism
-  solutionText: An iPhone box has 6 rectangular faces, making it a rectangular prism.
-  hintText: It's a box with rectangles for its faces. What do we call a 3D rectangle?
-  arShapeName: Cuboid
 --- !u!1 &814988883
 GameObject:
   m_ObjectHideFlags: 0
@@ -14256,16 +14230,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4acb820b7ca1b4e8db587523b76d8756, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ExerciseCard
+  databaseIndex: 1
   answerInput: {fileID: 1605398937}
   checkButton: {fileID: 1579166212}
   viewInARButton: {fileID: 1868618824}
   checkButtonImage: {fileID: 1579166213}
-  correctAnswer: 628.32
-  solutionText: "Volume = \u03C0 \xD7 r\xB2 \xD7 h\nV = 3.14159 \xD7 5\xB2 \xD7 8\nV
-    = 3.14159 \xD7 25 \xD7 8\nV \u2248 628.32 cm\xB3"
-  hintText: "The volume of a cylinder is V = \u03C0r\xB2h. Make sure you square the
-    radius first, then multiply by the height and Pi!"
-  arShapeName: Cylinder
 --- !u!1 &1049172671
 GameObject:
   m_ObjectHideFlags: 0
@@ -14704,16 +14673,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4acb820b7ca1b4e8db587523b76d8756, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ExerciseCard
+  databaseIndex: 8
   answerInput: {fileID: 847513727}
   checkButton: {fileID: 1430105326}
   viewInARButton: {fileID: 2129626569}
   checkButtonImage: {fileID: 1430105327}
-  correctAnswer: triangular prism
-  solutionText: A Toblerone has triangular ends connected by rectangular sides, forming
-    a triangular prism.
-  hintText: "Look at the ends of the chocolate bar\u2014they are triangles! What
-    kind of prism has a triangle base?"
-  arShapeName: TriangularPrism
 --- !u!1 &1072141267
 GameObject:
   m_ObjectHideFlags: 0
@@ -17924,16 +17888,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4acb820b7ca1b4e8db587523b76d8756, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ExerciseCard
+  databaseIndex: 10
   answerInput: {fileID: 1132946580}
   checkButton: {fileID: 453465316}
   viewInARButton: {fileID: 1849210644}
   checkButtonImage: {fileID: 453465317}
-  correctAnswer: 4
-  solutionText: "Volume = (1/3) \xD7 Base Area \xD7 Height\nBase Area (square) =
-    2 \xD7 2 = 4\nV = (1/3) \xD7 4 \xD7 3\nV = 4 mi\xB3"
-  hintText: "The base is a square, so find its area first (side \xD7 side). Then
-    multiply that area by the height, and divide by 3!"
-  arShapeName: Pyramid
 --- !u!1 &1281110558
 GameObject:
   m_ObjectHideFlags: 0
@@ -18490,16 +18449,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4acb820b7ca1b4e8db587523b76d8756, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ExerciseCard
+  databaseIndex: 13
   answerInput: {fileID: 252115716}
   checkButton: {fileID: 2048370317}
   viewInARButton: {fileID: 344987765}
   checkButtonImage: {fileID: 2048370318}
-  correctAnswer: 400
-  solutionText: "Volume = length \xD7 width \xD7 height\nV = 10 \xD7 5 \xD7 8\nV
-    = 400 m\xB3"
-  hintText: A cuboid is just another name for a rectangular prism. Just multiply
-    the length, width, and height together!
-  arShapeName: Cuboid
 --- !u!1 &1343113516
 GameObject:
   m_ObjectHideFlags: 0
@@ -18722,18 +18676,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4acb820b7ca1b4e8db587523b76d8756, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ExerciseCard
+  databaseIndex: 12
   answerInput: {fileID: 1563451818}
   checkButton: {fileID: 1157167882}
   viewInARButton: {fileID: 967158015}
   checkButtonImage: {fileID: 1157167883}
-  correctAnswer: 215
-  solutionText: "Base Area = 0.5 \xD7 Perimeter \xD7 apothem\nPerimeter = 6 sides
-    \xD7 5 mi = 30\nBase Area = 0.5 \xD7 30 \xD7 4.3 = 64.5\nVolume = (1/3) \xD7
-    Base Area \xD7 Height\nV = (1/3) \xD7 64.5 \xD7 10\nV = 215 mi\xB3"
-  hintText: "First, find the area of the hexagon using: Area = 0.5 \xD7 Perimeter
-    \xD7 apothem. The perimeter is 6 times the side length. Once you have the area,
-    use the pyramid volume formula!"
-  arShapeName: Pyramid
 --- !u!1 &1381041925
 GameObject:
   m_ObjectHideFlags: 0
@@ -25800,18 +25747,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4acb820b7ca1b4e8db587523b76d8756, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ExerciseCard
+  databaseIndex: 11
   answerInput: {fileID: 266051232}
   checkButton: {fileID: 1015650293}
   viewInARButton: {fileID: 616806054}
   checkButtonImage: {fileID: 1015650294}
-  correctAnswer: 56
-  solutionText: "The base is a right triangle (sides 6, 8, 10).\nBase Area = 0.5
-    \xD7 6 \xD7 8 = 24\nVolume = (1/3) \xD7 Base Area \xD7 Height\nV = (1/3) \xD7
-    24 \xD7 7\nV = 56 ft\xB3"
-  hintText: "The triangle base has sides of 6, 8, and 10. The 6 and 8 are the legs
-    of a right triangle. Find the area of that triangle first (0.5 \xD7 base \xD7
-    height) before plugging it into the pyramid volume formula!"
-  arShapeName: Pyramid
 --- !u!1 &1850765874
 GameObject:
   m_ObjectHideFlags: 0
@@ -26414,16 +26354,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4acb820b7ca1b4e8db587523b76d8756, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ExerciseCard
+  databaseIndex: 0
   answerInput: {fileID: 1049172673}
   checkButton: {fileID: 170167999}
   viewInARButton: {fileID: 297974925}
   checkButtonImage: {fileID: 170168000}
-  correctAnswer: 30
-  solutionText: "Volume = Length \xD7 Width \xD7 Height\nV = 2 \xD7 3 \xD7 5\nV =
-    30 ft\xB3"
-  hintText: "Remember the formula for a rectangular prism is V = l \xD7 w \xD7 h.
-    Try multiplying all three numbers together!"
-  arShapeName: Cuboid
 --- !u!1 &1934991259
 GameObject:
   m_ObjectHideFlags: 0
@@ -26662,15 +26597,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4acb820b7ca1b4e8db587523b76d8756, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ExerciseCard
+  databaseIndex: 4
   answerInput: {fileID: 651678571}
   checkButton: {fileID: 1042589622}
   viewInARButton: {fileID: 223770870}
   checkButtonImage: {fileID: 1042589623}
-  correctAnswer: cube
-  solutionText: A Rubik's cube has 6 equal square faces, which defines a cube.
-  hintText: The name of the object gives it away! It is a box where every single
-    side is exactly the same length.
-  arShapeName: Cuboid
 --- !u!1 &1938618676
 GameObject:
   m_ObjectHideFlags: 0
@@ -27043,15 +26974,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4acb820b7ca1b4e8db587523b76d8756, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ExerciseCard
+  databaseIndex: 6
   answerInput: {fileID: 314877579}
   checkButton: {fileID: 1493784290}
   viewInARButton: {fileID: 1013422609}
   checkButtonImage: {fileID: 1493784291}
-  correctAnswer: pyramid
-  solutionText: The ancient Egyptian resting places are famous square-based pyramids.
-  hintText: Think about the Great Sphinx. What giant structures are right behind
-    it?
-  arShapeName: Pyramid
 --- !u!1 &1964053722
 GameObject:
   m_ObjectHideFlags: 0

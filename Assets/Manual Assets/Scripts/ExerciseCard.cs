@@ -2,90 +2,113 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using UnityEngine.XR.Management; // REQUIRED FOR AR SAFE LAUNCH
+using System.Collections;        // REQUIRED FOR COROUTINES
 
 public class ExerciseCard : MonoBehaviour
 {
+    [Header("Which Exercise is this?")]
+    [Tooltip("0 for Exercise 1, 1 for Exercise 2, etc.")]
+    public int databaseIndex; 
+
     [Header("UI Elements")]
     public TMP_InputField answerInput;
     public Button checkButton;
     public Button viewInARButton; 
     public Image checkButtonImage; 
 
-    [Header("Exercise Settings (Fill these in!)")]
-    [Tooltip("Can be a number like '30' or a word like 'cylinder'")]
-    public string correctAnswer; 
-    [TextArea(3, 5)] public string solutionText;
-    [TextArea(3, 5)] public string hintText;
-    
-    [Header("AR Settings")]
-    public string arShapeName; // "Cuboid", "Cylinder", "Sphere", etc.
-
     void Start()
     {
-        // Automatically hook up the buttons when the app starts
         if (checkButton != null) checkButton.onClick.AddListener(CheckAnswer);
         if (viewInARButton != null) viewInARButton.onClick.AddListener(LaunchARView);
     }
 
     private void CheckAnswer()
     {
-        // 1. Clean up what they typed (remove accidental spaces and make it lowercase)
+        if (ExercisesDatabase.Instance == null) return;
+        
+        ExerciseData currentEx = ExercisesDatabase.Instance.allExercises[databaseIndex];
         string userInput = answerInput.text.Trim().ToLower();
-        string expected = correctAnswer.Trim().ToLower();
 
         if (string.IsNullOrEmpty(userInput))
         {
-            ExercisePopupManager.Instance.ShowPopup(false, "Please type an answer first!");
+            if (ExercisePopupManager.Instance != null)
+                ExercisePopupManager.Instance.ShowPopup(false, "Please type an answer first!");
             return;
         }
 
         bool isCorrect = false;
 
-        // 2. Try testing it as a Math Problem first (Allows for a 0.05 margin of error for Pi rounding)
-        if (float.TryParse(userInput, out float userNum) && float.TryParse(expected, out float expectedNum))
+        if (currentEx.questionType == QuestionType.CalculateVolume)
         {
-            if (Mathf.Abs(userNum - expectedNum) <= 0.05f) 
+            if (float.TryParse(userInput, out float userNum))
             {
-                isCorrect = true; 
+                if (Mathf.Abs(userNum - currentEx.correctVolume) <= 0.1f) isCorrect = true; 
             }
         }
-        // 3. If it's not a math problem, check if they typed the right word
-        else if (userInput == expected)
+        else if (currentEx.questionType == QuestionType.IdentifyShape)
         {
-            isCorrect = true;
+            if (userInput == currentEx.correctShapeName.ToLower()) isCorrect = true;
         }
 
-        // 4. Trigger the results
         if (isCorrect)
         {
-            checkButtonImage.color = new Color(0.3f, 0.8f, 0.3f); // Light up Green
-            answerInput.interactable = false; // Lock the text box
-            checkButton.interactable = false; // Lock the check button
+            if (checkButtonImage != null) checkButtonImage.color = new Color(0.3f, 0.8f, 0.3f);
+            answerInput.interactable = false; 
+            checkButton.interactable = false; 
             
-            ExercisePopupManager.Instance.ShowPopup(true, solutionText);
+            if (ExercisePopupManager.Instance != null)
+                ExercisePopupManager.Instance.ShowPopup(true, currentEx.solutionText);
         }
         else
         {
-            ExercisePopupManager.Instance.ShowPopup(false, hintText);
+            if (ExercisePopupManager.Instance != null)
+                ExercisePopupManager.Instance.ShowPopup(false, currentEx.hintText);
         }
     }
 
+    // ==========================================
+    // THE SAFE AR LAUNCH PROTOCOL
+    // ==========================================
     private void LaunchARView()
     {
-        // Tell the AR Controller which shape to load
-        ButtonScript.selectedShape = arShapeName; 
+        if (ExercisesDatabase.Instance != null)
+        {
+            ExercisesDatabase.Instance.currentExerciseIndex = databaseIndex;
+        }
         
-        // Ensure we tell the app we ARE in exercise mode
         ExerciseManager.isExerciseMode = true;
         
-        // Launch the AR Scene smoothly
+        // Trigger the safe launch instead of a direct scene load
+        StartCoroutine(LaunchARSafe());
+    }
+
+    IEnumerator LaunchARSafe()
+    {
+        // 1. Safely shut down the previous camera pipeline
+        if (XRGeneralSettings.Instance.Manager.isInitializationComplete)
+        {
+            XRGeneralSettings.Instance.Manager.DeinitializeLoader();
+            yield return null; 
+        }
+
+        // 2. Boot it up fresh
+        yield return XRGeneralSettings.Instance.Manager.InitializeLoader();
+
+        if (XRGeneralSettings.Instance.Manager.activeLoader != null)
+        {
+            XRGeneralSettings.Instance.Manager.StartSubsystems();
+        }
+        
+        // 3. Load the scene! (Make sure the name exactly matches your exercise scene)
+        // 3. Load the scene! (Changed back to your actual AR scene name!)
         if (SceneFader.Instance != null)
         {
             SceneFader.Instance.LoadSceneSmoothly("AR_Environment"); 
         }
         else
         {
-            SceneManager.LoadScene("AR_Environment"); // Fallback
+            SceneManager.LoadScene("AR_Environment"); 
         }
     }
 }

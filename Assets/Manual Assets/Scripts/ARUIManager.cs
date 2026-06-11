@@ -51,6 +51,10 @@ public class ARUIManager : MonoBehaviour
     private RectTransform colorMenuRect;
     private Vector2 colorMenuOpenPos;
 
+    [Header("Exercise Grading UI")]
+    public TMPro.TMP_InputField answerInputField;
+    public TMPro.TextMeshProUGUI feedbackText;
+
     public string currentUnit = "cm";
     private bool isUIVisible = true;
     private bool isSystemUpdating = false;
