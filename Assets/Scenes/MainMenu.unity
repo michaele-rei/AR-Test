@@ -1036,6 +1036,59 @@ MonoBehaviour:
       8. \nV \u2248 2513.27 in\xB3."
     correctVolume: 2513.27
     correctShapeName: 
+  shapeCheckpoints:
+  - shapeType: Cuboid
+    q1Text: Find the volume of a cuboid with a length of 4, width of 3, and height
+      of 2.
+    q1Answer: 24
+    q2Text: If a cuboid has a volume of 60, a length of 5, and a width of 3, what
+      is its height?
+    q2Answer: 4
+    q3Text: How many rectangular faces does a standard cuboid have?
+    q3Answer: 6
+  - shapeType: Cylinder
+    q1Text: Find the volume of a cylinder with a radius of 2 and a height of 5. (Use
+      3.14 for Pi)
+    q1Answer: 62.8
+    q2Text: A cylinder has a volume of 314.16 and a radius of 5. What is its height?
+    q2Answer: 4
+    q3Text: What 2D shape makes up the top and bottom bases of a cylinder?
+    q3Answer: circle
+  - shapeType: Sphere
+    q1Text: Find the volume of a sphere with a radius of 3. (Use 3.14 for Pi)
+    q1Answer: 113.04
+    q2Text: If a sphere has a volume of 33.51, what is its radius?
+    q2Answer: 2
+    q3Text: What do we call the distance from the exact center of a sphere to its
+      outer surface?
+    q3Answer: radius
+  - shapeType: TriangularPrism
+    q1Text: A triangular prism has a triangle base area of 6 and a length of 10.
+      What is the volume?
+    q1Answer: 60
+    q2Text: A triangular prism has a volume of 100 and a base area of 20. What is
+      its length?
+    q2Answer: 5
+    q3Text: How many triangular faces does a triangular prism have?
+    q3Answer: 2
+  - shapeType: Cone
+    q1Text: Find the volume of a cone with a radius of 3 and a height of 4. (Use
+      3.14 for Pi)
+    q1Answer: 37.68
+    q2Text: A cone has a volume of 157.08 and a radius of 5. What is its height?
+    q2Answer: 6
+    q3Text: What is the specific mathematical term for the single sharp point at
+      the very top of a cone?
+    q3Answer: apex
+  - shapeType: Pyramid
+    q1Text: A square pyramid has a base side of 4 and a height of 6. What is the
+      volume?
+    q1Answer: 32
+    q2Text: A pyramid has a volume of 48 and a height of 4. What is the total area
+      of its base?
+    q2Answer: 36
+    q3Text: What 2D shape makes up the base of the Great Pyramid of Giza?
+    q3Answer: square
 --- !u!1 &508865806
 GameObject:
   m_ObjectHideFlags: 0

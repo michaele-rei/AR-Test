@@ -1426,9 +1426,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Identify the solid figure. The general shape of a traffic cone.
-
-'
+  m_text: A traffic cone has a circular base that tapers to a single point. What
+    shape is this?
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 4650a095628c744a3b4bab968bd702c4, type: 2}
   m_sharedMaterial: {fileID: 895634511762949769, guid: 4650a095628c744a3b4bab968bd702c4, type: 2}
@@ -2044,7 +2043,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "Find the volume of a sphere with a circumference of 12\u03C0 in."
+  m_text: "Find the radius: C = 12\u03C0. Once you have the radius, find the volume
+    of the sphere."
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 4650a095628c744a3b4bab968bd702c4, type: 2}
   m_sharedMaterial: {fileID: 895634511762949769, guid: 4650a095628c744a3b4bab968bd702c4, type: 2}
@@ -2071,7 +2071,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 63.25
+  m_fontSize: 59.7
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -2181,7 +2181,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Identify the solid figure. A 3x3 rubik's cube.
+  m_text: A Rubik's cube has 6 equal square faces. What is this shape?
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 4650a095628c744a3b4bab968bd702c4, type: 2}
   m_sharedMaterial: {fileID: 895634511762949769, guid: 4650a095628c744a3b4bab968bd702c4, type: 2}
@@ -2208,7 +2208,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 72
+  m_fontSize: 63.25
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -7793,9 +7793,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Identify the solid figure. The resting place of Pharaohs in Egypt.
-
-'
+  m_text: This souvenir model of an ancient Egyptian resting place has a square base.
+    What shape is this?
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 4650a095628c744a3b4bab968bd702c4, type: 2}
   m_sharedMaterial: {fileID: 895634511762949769, guid: 4650a095628c744a3b4bab968bd702c4, type: 2}
@@ -7822,7 +7821,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 63.25
+  m_fontSize: 51.9
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -7932,8 +7931,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Identify the volume of the cuboid whose dimensions are: height =  8 m,
-    length = 10 m, width = 5 m.'
+  m_text: A pencil box is 10 cm long, 5 cm wide, and 8 cm tall. Find the volume.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 4650a095628c744a3b4bab968bd702c4, type: 2}
   m_sharedMaterial: {fileID: 895634511762949769, guid: 4650a095628c744a3b4bab968bd702c4, type: 2}
@@ -7960,7 +7958,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 52.8
+  m_fontSize: 63.25
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -11621,9 +11619,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Identify the solid figure. A standard golf ball.
-
-'
+  m_text: A golf ball is perfectly round like a globe. What shape is this?
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 4650a095628c744a3b4bab968bd702c4, type: 2}
   m_sharedMaterial: {fileID: 895634511762949769, guid: 4650a095628c744a3b4bab968bd702c4, type: 2}
@@ -11650,7 +11646,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 72
+  m_fontSize: 63.25
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -14507,8 +14503,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Find the volume of a rectangular prism with a length or 2 ft, a width of
-    3 ft, and a height of 5 ft.
+  m_text: A wooden block has a length of 2 in, width of 3 in, and height of 5 in.
+    Find the volume.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 4650a095628c744a3b4bab968bd702c4, type: 2}
   m_sharedMaterial: {fileID: 895634511762949769, guid: 4650a095628c744a3b4bab968bd702c4, type: 2}
@@ -14535,7 +14531,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 53.3
+  m_fontSize: 57.65
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -15284,9 +15280,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Identify the solid figure. The box of an iPhone 17 Pro Max.
-
-'
+  m_text: An iPhone box has 6 rectangular faces. What shape is this?
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 4650a095628c744a3b4bab968bd702c4, type: 2}
   m_sharedMaterial: {fileID: 895634511762949769, guid: 4650a095628c744a3b4bab968bd702c4, type: 2}
@@ -16397,7 +16391,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Find the volume of a cylinder with a radius of 5 cm and a height of 8 cm.
+  m_text: A cylinder has a radius of 5 cm and height of 8 cm. Find the volume.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 4650a095628c744a3b4bab968bd702c4, type: 2}
   m_sharedMaterial: {fileID: 895634511762949769, guid: 4650a095628c744a3b4bab968bd702c4, type: 2}
@@ -16534,9 +16528,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Identify the solid figure. The general shape of the chocolate Toblerone.
-
-'
+  m_text: A Toblerone has triangular ends connected by rectangular sides. What shape
+    is this?
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 4650a095628c744a3b4bab968bd702c4, type: 2}
   m_sharedMaterial: {fileID: 895634511762949769, guid: 4650a095628c744a3b4bab968bd702c4, type: 2}
@@ -16563,7 +16556,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 63.25
+  m_fontSize: 55.3
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -24240,8 +24233,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Identify the volume of a cylinder whose dimensions are: height =  8 in,
-    and radius = 10 in.'
+  m_text: Assuming the radius is 10 in and the height is 8 in, find the volume of
+    this bucket.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 4650a095628c744a3b4bab968bd702c4, type: 2}
   m_sharedMaterial: {fileID: 895634511762949769, guid: 4650a095628c744a3b4bab968bd702c4, type: 2}
@@ -24268,7 +24261,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 55.65
+  m_fontSize: 63.25
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -24609,8 +24602,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Identify the volume of the pyramid with a regular hexagonal base whose
-    dimensions are: height = 10 mi, side = 5 mi, apothem = 4.3 mi'
+  m_text: A party hat (cone) has a radius of 5 in and a height of 10 in. Find the
+    volume.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 4650a095628c744a3b4bab968bd702c4, type: 2}
   m_sharedMaterial: {fileID: 895634511762949769, guid: 4650a095628c744a3b4bab968bd702c4, type: 2}
@@ -24637,7 +24630,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 47.15
+  m_fontSize: 63.25
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -26032,9 +26025,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Identify the volume of the pyramid with triangular base whose dimensions
-    are: height = 7 ft, longer base side = 8 ft, shorter base side = 6 ft, and hypotenuse
-    of base = 10 ft.'
+  m_text: A toy camping tent is a triangular prism. The front triangle has a base
+    of 6 in and height of 7 in. The tent is 10 in long. Find the volume.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 4650a095628c744a3b4bab968bd702c4, type: 2}
   m_sharedMaterial: {fileID: 895634511762949769, guid: 4650a095628c744a3b4bab968bd702c4, type: 2}
@@ -26061,7 +26053,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 38.25
+  m_fontSize: 47.15
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -27323,8 +27315,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Identify the volume of the square pyramid whose dimensions are: height
-    = 3 mi, side = 2 mi'
+  m_text: This glass paperweight is a square pyramid. Its base is 2x2 in and it stands
+    3 in tall. Find the volume.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 4650a095628c744a3b4bab968bd702c4, type: 2}
   m_sharedMaterial: {fileID: 895634511762949769, guid: 4650a095628c744a3b4bab968bd702c4, type: 2}
@@ -27351,7 +27343,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 52.8
+  m_fontSize: 50.8
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -27592,7 +27584,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Identify the solid figure. Looks like a toilet roll.
+  m_text: A toilet roll has a circular top and bottom connected by a curved surface.
+    What shape is this?
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 4650a095628c744a3b4bab968bd702c4, type: 2}
   m_sharedMaterial: {fileID: 895634511762949769, guid: 4650a095628c744a3b4bab968bd702c4, type: 2}
@@ -27619,7 +27612,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 72
+  m_fontSize: 52.85
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1

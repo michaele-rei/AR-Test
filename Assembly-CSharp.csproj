@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="Assets/Manual Assets/Scripts/BouncyButtonTween.cs" />
     <Compile Include="Assets/Manual Assets/Scripts/SceneFader.cs" />
+    <Compile Include="Assets/Manual Assets/Scripts/ConceptCheckManager.cs" />
     <Compile Include="Assets/Manual Assets/Scripts/DimensionBuilder.cs" />
     <Compile Include="Assets/Manual Assets/Scripts/UIManager.cs" />
     <Compile Include="Assets/Manual Assets/Scripts/ARLearning.cs" />
