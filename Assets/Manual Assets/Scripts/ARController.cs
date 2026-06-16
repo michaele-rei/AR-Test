@@ -6,7 +6,7 @@ using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
 using DG.Tweening;
-using UnityEngine.EventSystems; // REQUIRED FOR UI BLOCKER
+using UnityEngine.EventSystems; 
 
 public class ARController : MonoBehaviour
 {
@@ -20,6 +20,8 @@ public class ARController : MonoBehaviour
 
     [Header("UI & Integration")]
     public ARUIManager uiManager; 
+    [Tooltip("Drag EVERY UI panel here that should be HIDDEN until placement (Colors, Sliders, Pencil, etc.)")]
+    public GameObject[] uiPanelsToHideOnStart; // <-- NEW: Array list for multiple UI parts!
 
     [Header("AR Components")]
     public GameObject promptText;
@@ -42,39 +44,40 @@ public class ARController : MonoBehaviour
     private bool isShowcasing = false;
     private float showcaseTimer = 0f;
     private bool hasSeenShowcase = false; 
+    
+    public bool isConceptCheckActive = false; 
 
     void Start()
     {
-        // ==========================================
-        // THE FRESH START PROTOCOL
-        // ==========================================
-        // 1. Force the physical AR hardware to wipe its memory and reboot
-        ARSession arSession = FindObjectOfType<ARSession>();
+        // Hide EVERYTHING in the list at startup!
+        foreach (GameObject panel in uiPanelsToHideOnStart)
+        {
+            if (panel != null) panel.SetActive(false);
+        }
+
+        ARSession arSession = FindFirstObjectByType<ARSession>();
         if (arSession != null) 
         {
             arSession.Reset();
         }
 
-        // 2. Wipe all script memory from the previous session
         isPlaced = false;
         isShowcasing = false;
         hasSeenShowcase = false;
+        isConceptCheckActive = false;
         ClearOldLabels();
+        
         if (spawnedObject != null) 
         {
             Destroy(spawnedObject);
             spawnedObject = null;
         }
 
-        // 3. Reset the Camera Simulator pipeline (Your existing code)
         if (LoaderUtility.GetActiveLoader() != null) 
         { 
             LoaderUtility.GetActiveLoader().Initialize(); 
         }
 
-        // ==========================================
-        // EXERCISE SETUP
-        // ==========================================
         if (ExerciseManager.isExerciseMode && ExercisesDatabase.Instance != null)
         {
             ExerciseData currentEx = ExercisesDatabase.Instance.GetCurrentExercise();
@@ -90,7 +93,6 @@ public class ARController : MonoBehaviour
 
     void Update()
     {
-        // 1. If the shape is completely locked in, run the showcase and stop!
         if (isPlaced && spawnedObject != null)
         {
             if (isShowcasing) AnimateShowcase();
@@ -98,25 +100,20 @@ public class ARController : MonoBehaviour
             return; 
         }
 
-        // 2. Track the finger for Spawning, Dragging, and Releasing
         if (!isPlaced && Input.touchCount > 0)
         {
             Touch touch = Input.GetTouch(0);
 
-            // UI Blocker: Only block the initial tap! (Allows you to drag underneath UI menus without freezing)
             if (touch.phase == TouchPhase.Began && IsPointerOverUI()) return; 
 
-            // TAP: Spawn the shape
             if (touch.phase == TouchPhase.Began)
             {
                 SpawnGhost(touch.position);
             }
-            // DRAG: Move the shape around the table
             else if (touch.phase == TouchPhase.Moved && spawnedObject != null)
             {
                 MoveGhost(touch.position);
             }
-            // LET GO: Lock it permanently!
             else if ((touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled) && spawnedObject != null)
             {
                 FinalizePlacement();
@@ -124,19 +121,15 @@ public class ARController : MonoBehaviour
         }
     }
 
-    // This checks for both Mouse Clicks (Simulator) and Physical Touches (iPhone)
     private bool IsPointerOverUI()
     {
         if (EventSystem.current == null) return false;
 
-        // 1. Check for Physical Device Touches
         if (Input.touchCount > 0)
         {
             return EventSystem.current.IsPointerOverGameObject(Input.touches[0].fingerId);
         }
 
-        // 2. Check for Simulator / Editor Mouse Clicks
-        // ONLY block if we are actually clicking the mouse, not just hovering!
         if (Input.GetMouseButton(0) || Input.GetMouseButtonDown(0))
         {
             return EventSystem.current.IsPointerOverGameObject();
@@ -149,37 +142,27 @@ public class ARController : MonoBehaviour
     {
         if (spawnedObject == null) return;
         
-        // 1. Calculate the rotation to face the camera
         Vector3 dirToCamera = Camera.main.transform.position - spawnedObject.transform.position;
         dirToCamera.y = 0;
         Quaternion textRotation = Quaternion.LookRotation(dirToCamera);
         textRotation *= Quaternion.Euler(0, 180, 0);
 
-        // ==========================================
-        // THE ANTI-STRETCH MATH
-        // ==========================================
-        // 2. Find exactly how distorted the parent shape is right now
         Vector3 parentScale = spawnedObject.transform.localScale;
         
-        // Prevent divide-by-zero errors if the shape scales to 0
         float safeX = Mathf.Max(Mathf.Abs(parentScale.x), 0.001f);
         float safeY = Mathf.Max(Mathf.Abs(parentScale.y), 0.001f);
         float safeZ = Mathf.Max(Mathf.Abs(parentScale.z), 0.001f);
         
-        // 3. Define the absolute world size of your text (Adjust if too big/small)
         float textWorldSize = 0.035f; 
         
-        // 4. Create the exact mathematical inverse scale
         Vector3 counterScale = new Vector3(textWorldSize / safeX, textWorldSize / safeY, textWorldSize / safeZ);
 
-        // 5. Apply the rotation and counter-scale to the main Volume Label
         if (volumeLabelObj != null) 
         {
             volumeLabelObj.transform.rotation = textRotation;
             volumeLabelObj.transform.localScale = counterScale;
         }
 
-        // 6. Apply the rotation and counter-scale to all Dimension lines
         foreach (var dim in activeDimensions)
         {
             if (dim != null)
@@ -188,7 +171,7 @@ public class ARController : MonoBehaviour
                 if (label != null) 
                 {
                     label.transform.rotation = textRotation;
-                    label.transform.localScale = counterScale; // Force the text to stop stretching!
+                    label.transform.localScale = counterScale; 
                 }
             }
         }
@@ -228,12 +211,10 @@ public class ARController : MonoBehaviour
 
     void SpawnGhost(Vector2 touchPos)
     {
-        // THE ANTI-DUPLICATE LOCK: If a shape already exists, absolutely do not spawn another one!
         if (spawnedObject != null) return; 
 
         Vector3 planePosition;
         
-        // Call the safe raycast function
         if (GetPlanePosition(touchPos, out planePosition))
         {
             GameObject prefabToUse = cuboidPrefab; 
@@ -247,7 +228,6 @@ public class ARController : MonoBehaviour
                 case "Cuboid": prefabToUse = cuboidPrefab; break;
             }
 
-            // Spawn it and paint it instantly!
             spawnedObject = Instantiate(prefabToUse, planePosition, Quaternion.identity);
             ApplyColorToMesh();
 
@@ -260,15 +240,12 @@ public class ARController : MonoBehaviour
     {
         Vector3 planePosition;
         
-        // If the finger is still dragging over a valid floor plane, move the shape!
         if (GetPlanePosition(touchPos, out planePosition))
         {
-            // Lerp makes the drag feel smooth instead of jittery
             spawnedObject.transform.position = Vector3.Lerp(spawnedObject.transform.position, planePosition, 0.2f);
         }
     }
 
-    // Bulletproof Raycast logic
     private bool GetPlanePosition(Vector2 touchPos, out Vector3 position)
     {
         position = Vector3.zero;
@@ -276,7 +253,7 @@ public class ARController : MonoBehaviour
         if (raycastManager == null)
         {
             raycastManager = GetComponent<ARRaycastManager>();
-            if (raycastManager == null) raycastManager = FindObjectOfType<ARRaycastManager>();
+            if (raycastManager == null) raycastManager = FindFirstObjectByType<ARRaycastManager>();
             if (raycastManager == null)
             {
                 Debug.LogError("AR_ERROR: ARRaycastManager is missing from the scene!");
@@ -302,6 +279,12 @@ public class ARController : MonoBehaviour
         isPlaced = true;
         TogglePlaneDetection(false);
         if (promptText != null) promptText.SetActive(false);
+        
+        // SHOW EVERYTHING: Turn all the UI panels back on!
+        foreach (GameObject panel in uiPanelsToHideOnStart)
+        {
+            if (panel != null) panel.SetActive(true);
+        }
 
         if (ExerciseManager.isExerciseMode)
         {
@@ -317,7 +300,7 @@ public class ARController : MonoBehaviour
             {
                 DOVirtual.DelayedCall(0.6f, () => 
                 {
-                    if (isPlaced) 
+                    if (isPlaced && !isConceptCheckActive) 
                     {
                         isShowcasing = true;
                         showcaseTimer = 0f;
@@ -337,6 +320,9 @@ public class ARController : MonoBehaviour
     public void UpdateDimensionsFromUI(float valX, float valY, float valZ, bool isUserInput)
     {
         if (spawnedObject == null) return;
+        
+        if (isConceptCheckActive) return; 
+
         if (isUserInput) isShowcasing = false; 
         ApplyMathAndScale(valX, valY, valZ, false);
     }
@@ -407,18 +393,18 @@ public class ARController : MonoBehaviour
         }
         else if (selectedShape == "Pyramid")
         {
-            spawnedObject.transform.localScale = new Vector3(x, y, x);
-            volume = (1f / 3f) * Mathf.Pow(x, 2) * y;
+            spawnedObject.transform.localScale = new Vector3(x, y, z);
+            volume = (1f / 3f) * x * z * y; 
             
             Vector3 p = new Vector3(-0.5f, -0.5f, -0.5f); 
             CreateDimension(p, new Vector3(0.5f, -0.5f, -0.5f), new Vector3(0, -0.05f, -0.05f), $"b = {dX:F2} {u}"); 
-            CreateDimension(p, new Vector3(-0.5f, -0.5f, 0.5f), new Vector3(-0.05f, -0.05f, 0), $"b = {dX:F2} {u}"); 
+            CreateDimension(p, new Vector3(-0.5f, -0.5f, 0.5f), new Vector3(-0.05f, -0.05f, 0), $"b = {dZ:F2} {u}"); 
             CreateDimension(new Vector3(0, -0.5f, 0), new Vector3(0, 0.5f, 0), new Vector3(0.6f, 0, 0), $"h = {dY:F2} {u}");
             
-            CreateVolumeLabel($"Vol: {(volume / Mathf.Pow(mult, 3)):F2} {u}³", (x+y)/2f, volumeLabelPos);
+            CreateVolumeLabel($"Vol: {(volume / Mathf.Pow(mult, 3)):F2} {u}³", (x+y+z)/3f, volumeLabelPos);
         }
 
-        if (uiManager != null) uiManager.UpdateDashboardVolume(volume);
+        if (uiManager != null && !isConceptCheckActive) uiManager.UpdateDashboardVolume(volume);
         BillboardLabels();
     }
 
@@ -436,10 +422,16 @@ public class ARController : MonoBehaviour
         StopShowcase();
         if (spawnedObject != null) { Destroy(spawnedObject); spawnedObject = null; }
         ClearOldLabels();
-        isPlaced = false;
         
-        // NEW: Force the app to forget the animation so it can play again!
+        isPlaced = false;
         hasSeenShowcase = false; 
+        isConceptCheckActive = false;
+        
+        // HIDE EVERYTHING: The object is gone, turn the list off!
+        foreach (GameObject panel in uiPanelsToHideOnStart)
+        {
+            if (panel != null) panel.SetActive(false);
+        }
         
         TogglePlaneDetection(true);
         if (promptText != null) promptText.SetActive(true);
@@ -451,26 +443,28 @@ public class ARController : MonoBehaviour
         ClearOldLabels();
         Vector3 defaultLabelPos = new Vector3(0, 0.7f, 0);
 
-        // 1. Fetch current question from our database
-        if (ExercisesDatabase.Instance == null)
-        {
-            Debug.LogError("ExercisesDatabase Instance is missing in scene!");
-            return;
-        }
+        if (ExercisesDatabase.Instance == null) return;
         ExerciseData currentEx = ExercisesDatabase.Instance.GetCurrentExercise();
         if (currentEx == null) return;
 
-        // 2. Convert desktop real-world measurements to Unity world meters for a perfect 1:1 scale
-        float conversionFactor = 1f; // Default for meters "m"
+        // 2. Convert desktop real-world measurements to Unity world meters
+        float conversionFactor = 1f; 
         if (currentEx.unitType == "cm") conversionFactor = 0.01f;
         else if (currentEx.unitType == "in") conversionFactor = 0.0254f;
+
+        // ==========================================
+        // MAKE IT BIGGER (HUMAN SIZED)
+        // ==========================================
+        // Multiply the realistic scale by a massive factor. 
+        // 20f turns a tiny 5cm block into a massive 1-meter tall object!
+        float giantMultiplier = 20f; 
+        conversionFactor *= giantMultiplier;
 
         float x = currentEx.dimensionX * conversionFactor;
         float y = currentEx.dimensionY * conversionFactor;
         float z = currentEx.dimensionZ * conversionFactor;
         string u = currentEx.unitType;
 
-        // 3. Apply the exact 1:1 physical dimensions to your prefabs based on their structural math
         if (selectedShape == "Cuboid")
         {
             spawnedObject.transform.localScale = new Vector3(x, y, z);
@@ -490,7 +484,6 @@ public class ARController : MonoBehaviour
         else if (selectedShape == "Sphere")
         {
             spawnedObject.transform.localScale = Vector3.one * x;
-            // Display radius on the dimension tracker label
             CreateDimension(Vector3.zero, new Vector3(0.5f, 0, 0), new Vector3(0, 0.55f, 0), $"r = {(currentEx.dimensionX / 2f):F2} {u}");
         }   
         else if (selectedShape == "Cylinder")
@@ -507,14 +500,13 @@ public class ARController : MonoBehaviour
         }
         else if (selectedShape == "Pyramid")
         {
-            spawnedObject.transform.localScale = new Vector3(x, y, x);
+            spawnedObject.transform.localScale = new Vector3(x, y, z);
             Vector3 p = new Vector3(-0.5f, -0.5f, -0.5f); 
             CreateDimension(p, new Vector3(0.5f, -0.5f, -0.5f), new Vector3(0, -0.05f, -0.05f), $"b = {currentEx.dimensionX} {u}"); 
-            CreateDimension(p, new Vector3(-0.5f, -0.5f, 0.5f), new Vector3(-0.05f, -0.05f, 0), $"b = {currentEx.dimensionX} {u}"); 
+            CreateDimension(p, new Vector3(-0.5f, -0.5f, 0.5f), new Vector3(-0.05f, -0.05f, 0), $"b = {currentEx.dimensionZ} {u}"); 
             CreateDimension(new Vector3(0, -0.5f, 0), new Vector3(0, 0.5f, 0), new Vector3(0.6f, 0, 0), $"h = {currentEx.dimensionY} {u}");
         }
 
-        // 4. Update the text overlays via your UI managers or floating labels
         if (promptText != null)
         {
             promptText.SetActive(false);
@@ -582,17 +574,11 @@ public class ARController : MonoBehaviour
     {
         string cleanedColor = colorName.ToLower().Trim();
 
-        if (cleanedColor == "red") 
-            currentSelectedColor = Color.red;
-        else if (cleanedColor == "green") 
-            currentSelectedColor = Color.green;
-        else if (cleanedColor == "yellow") 
-            currentSelectedColor = Color.yellow;
+        if (cleanedColor == "red") currentSelectedColor = Color.red;
+        else if (cleanedColor == "green") currentSelectedColor = Color.green;
+        else if (cleanedColor == "yellow") currentSelectedColor = Color.yellow;
 
-        if (spawnedObject != null)
-        {
-            ApplyColorToMesh();
-        }
+        if (spawnedObject != null) ApplyColorToMesh();
     }
 
     private void ApplyColorToMesh()
@@ -602,15 +588,10 @@ public class ARController : MonoBehaviour
         {
             if (!(r is LineRenderer)) 
             {
-                // Bulletproof Color logic that checks for URP vs Standard materials!
                 if (r.material.HasProperty("_BaseColor"))
-                {
                     r.material.SetColor("_BaseColor", currentSelectedColor);
-                }
                 else
-                {
                     r.material.color = currentSelectedColor; 
-                }
             }
         }
     }
@@ -640,6 +621,27 @@ public class ARController : MonoBehaviour
                     dim.transform.DOPunchScale(dimScale * punchIntensity, duration, 5, 1).SetLink(dim.gameObject);
                 }
             }
+        }
+    }
+
+    public void ForceShapeScale(Vector3 newScale)
+    {
+        if (spawnedObject != null)
+        {
+            isConceptCheckActive = true; 
+            isShowcasing = false; 
+            ApplyMathAndScale(newScale.x, newScale.y, newScale.z, false);
+        }
+    }
+
+    public void ResetFromConceptCheck()
+    {
+        isConceptCheckActive = false; 
+        
+        if (spawnedObject != null)
+        {
+            ApplyMathAndScale(1f, 1f, 1f, false);
+            if (uiManager != null) uiManager.UpdateSlidersSilently(1f, 1f, 1f);
         }
     }
 }

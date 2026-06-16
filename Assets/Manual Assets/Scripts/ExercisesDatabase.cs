@@ -27,7 +27,7 @@ public class ExerciseData
 }
 
 // ==========================================
-// NEW: THE 3-PART CONCEPT CHECK BLUEPRINT
+// THE 3-PART CONCEPT CHECK BLUEPRINT
 // ==========================================
 [System.Serializable]
 public class ConceptCheckData
@@ -37,10 +37,12 @@ public class ConceptCheckData
     [Header("Question 1: Find Volume")]
     [TextArea(2, 3)] public string q1Text;
     public float q1Answer;
+    public Vector3 q1Dimensions; // <--- THE MISSING X, Y, Z SLOTS
 
     [Header("Question 2: Missing Dimension")]
     [TextArea(2, 3)] public string q2Text;
     public float q2Answer;
+    public Vector3 q2Dimensions; // <--- THE MISSING X, Y, Z SLOTS
 
     [Header("Question 3: Conceptual")]
     [TextArea(2, 3)] public string q3Text;
@@ -57,7 +59,7 @@ public class ExercisesDatabase : MonoBehaviour
     public ExerciseData[] allExercises; 
 
     [Header("The Learning Checkpoints")]
-    public ConceptCheckData[] shapeCheckpoints; // <--- NEW ARRAYS GO HERE
+    public ConceptCheckData[] shapeCheckpoints;
 
     void Awake()
     {

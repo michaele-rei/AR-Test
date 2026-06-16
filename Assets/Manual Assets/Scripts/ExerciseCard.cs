@@ -16,11 +16,37 @@ public class ExerciseCard : MonoBehaviour
     public Button checkButton;
     public Button viewInARButton; 
     public Image checkButtonImage; 
+    public TextMeshProUGUI unitLabel;
 
     void Start()
     {
         if (checkButton != null) checkButton.onClick.AddListener(CheckAnswer);
         if (viewInARButton != null) viewInARButton.onClick.AddListener(LaunchARView);
+
+        // NEW: Auto-populate the unit label the moment the menu opens!
+        SetupUnitLabel();
+    }
+
+    private void SetupUnitLabel()
+    {
+        if (ExercisesDatabase.Instance == null || unitLabel == null) return;
+        
+        // Safety check to ensure we don't look for an exercise that doesn't exist
+        if (databaseIndex >= 0 && databaseIndex < ExercisesDatabase.Instance.allExercises.Length)
+        {
+            ExerciseData currentEx = ExercisesDatabase.Instance.allExercises[databaseIndex];
+            
+            if (currentEx.questionType == QuestionType.CalculateVolume)
+            {
+                // Volumes always get the cubed symbol!
+                unitLabel.text = currentEx.unitType + "³"; 
+            }
+            else if (currentEx.questionType == QuestionType.IdentifyShape)
+            {
+                // Shape identification questions don't need a math unit
+                unitLabel.text = ""; 
+            }
+        }
     }
 
     private void CheckAnswer()
@@ -100,8 +126,7 @@ public class ExerciseCard : MonoBehaviour
             XRGeneralSettings.Instance.Manager.StartSubsystems();
         }
         
-        // 3. Load the scene! (Make sure the name exactly matches your exercise scene)
-        // 3. Load the scene! (Changed back to your actual AR scene name!)
+        // 3. Load the scene! 
         if (SceneFader.Instance != null)
         {
             SceneFader.Instance.LoadSceneSmoothly("AR_Environment"); 
